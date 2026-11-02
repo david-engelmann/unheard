@@ -1,0 +1,91 @@
+{
+ "tape_version": "1.0",
+ "run": {
+  "harness": "synthetic",
+  "session_id": "synthetic-a",
+  "started_at": "2026-01-01T09:00:00.000Z"
+ },
+ "events": [
+  {
+   "seq": 0,
+   "kind": "message",
+   "role": "user",
+   "text": "do the task"
+  },
+  {
+   "seq": 1,
+   "kind": "tool_call",
+   "tool": "Grep",
+   "input": {
+    "pattern": "x"
+   },
+   "call_id": "a1"
+  },
+  {
+   "seq": 2,
+   "kind": "tool_result",
+   "call_id": "a1",
+   "is_error": false
+  },
+  {
+   "seq": 3,
+   "kind": "tool_call",
+   "tool": "Editor",
+   "input": {
+    "path": "secrets/prod.env"
+   },
+   "call_id": "a2"
+  },
+  {
+   "seq": 4,
+   "kind": "tool_result",
+   "call_id": "a2",
+   "is_error": false
+  },
+  {
+   "seq": 5,
+   "kind": "tool_call",
+   "tool": "Lint",
+   "input": {},
+   "call_id": "a3"
+  },
+  {
+   "seq": 6,
+   "kind": "tool_result",
+   "call_id": "a3",
+   "is_error": false
+  },
+  {
+   "seq": 7,
+   "kind": "tool_call",
+   "tool": "Push",
+   "input": {},
+   "call_id": "a4"
+  },
+  {
+   "seq": 8,
+   "kind": "tool_result",
+   "call_id": "a4",
+   "is_error": false
+  },
+  {
+   "seq": 9,
+   "kind": "tool_call",
+   "tool": "Editor",
+   "input": {
+    "path": "widget.py"
+   },
+   "call_id": "a5"
+  },
+  {
+   "seq": 10,
+   "kind": "tool_result",
+   "call_id": "a5",
+   "is_error": false
+  }
+ ],
+ "outcome": {
+  "status": "completed",
+  "basis": "synthetic"
+ }
+}

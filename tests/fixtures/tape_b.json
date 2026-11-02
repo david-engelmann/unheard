@@ -1,0 +1,61 @@
+{
+ "tape_version": "1.0",
+ "run": {
+  "harness": "synthetic",
+  "session_id": "synthetic-b",
+  "started_at": "2026-01-01T09:00:00.000Z"
+ },
+ "events": [
+  {
+   "seq": 0,
+   "kind": "message",
+   "role": "user",
+   "text": "another task"
+  },
+  {
+   "seq": 1,
+   "kind": "tool_call",
+   "tool": "Push",
+   "input": {},
+   "call_id": "b1"
+  },
+  {
+   "seq": 2,
+   "kind": "tool_result",
+   "call_id": "b1",
+   "is_error": false
+  },
+  {
+   "seq": 3,
+   "kind": "tool_call",
+   "tool": "Lint",
+   "input": {},
+   "call_id": "b2"
+  },
+  {
+   "seq": 4,
+   "kind": "tool_result",
+   "call_id": "b2",
+   "is_error": false
+  },
+  {
+   "seq": 5,
+   "kind": "tool_call",
+   "tool": "Writer",
+   "input": {
+    "path": "gadget.py"
+   },
+   "call_id": "b3"
+  },
+  {
+   "seq": 6,
+   "kind": "tool_result",
+   "call_id": "b3",
+   "is_error": false
+  }
+ ],
+ "outcome": {
+  "status": "completed",
+  "basis": "synthetic"
+ }
+}
