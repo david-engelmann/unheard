@@ -132,3 +132,120 @@ def test_unheard_refuses_to_write_into_its_inputs(tmp_path, capsys):
                  str(target), "-o", str(target / "observations.json")])
     assert code == 1
     assert "never writes to its inputs" in capsys.readouterr().err
+
+
+def test_period_form_rules_measure_like_their_bare_forms():
+    assert classify("Do not edit secrets/prod.env.") == {
+        "shape": "prohibit-path", "path": "secrets/prod.env"}
+    assert classify("Use Editor for files ending in .py.") == {
+        "shape": "required-tool", "tool": "Editor",
+        "extension": ".py"}
+    assert classify("Never use Grep.") == {
+        "shape": "prohibit-tool", "tool": "Grep"}
+    assert classify("never use Grep") is None
+    assert classify("Use Editor for py files") is None
+
+
+def test_a_tape_that_cannot_be_digested_is_excluded(tmp_path):
+    target = tape_dir(tmp_path)
+    bad = {"tape_version": "1.0", "run": {},
+           "events": [{"seq": 0, "kind": "message",
+                       "temp": float("nan")}]}
+    (target / "tape_nan.json").write_text(json.dumps(bad))
+    out = tmp_path / "observations.json"
+    assert main(["score", str(FIX / "rules_synthetic.md"),
+                 str(target), "-o", str(out)]) == 0
+    document = json.loads(out.read_text())
+    excluded = {e["file"]: e for e in document["tapes"]["excluded"]}
+    assert "canonical form 1" in excluded["tape_nan.json"]["reason"]
+
+
+def test_a_duplicated_rule_is_scored_once_and_named(tmp_path):
+    rules = tmp_path / "rules.md"
+    rules.write_text("# S\n\n- Never use Grep\n- Never use Grep\n")
+    out = tmp_path / "observations.json"
+    assert main(["score", str(rules), str(tape_dir(tmp_path)),
+                 "-o", str(out)]) == 0
+    document = json.loads(out.read_text())
+    assert len(document["observations"]) == 1
+    assert document["duplicates"] == ["Never use Grep"]
+
+
+def test_an_unclosed_fence_warning_reaches_the_document(tmp_path):
+    rules = tmp_path / "rules.md"
+    rules.write_text("# S\n\n- Never use Grep\n\n```\n- Never call X\n")
+    out = tmp_path / "observations.json"
+    assert main(["score", str(rules), str(tape_dir(tmp_path)),
+                 "-o", str(out)]) == 0
+    document = json.loads(out.read_text())
+    assert any("unclosed fence" in w for w in document["warnings"])
+
+
+def test_the_relative_path_guard_holds(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "r.md").write_text((FIX / "rules_synthetic.md").read_text())
+    tape_dir(tmp_path)
+    code = main(["score", "r.md", "tapes", "-o", "tapes/obs.json"])
+    assert code == 1
+
+
+def test_a_path_in_an_input_key_is_a_touch(tmp_path):
+    tape = {"tape_version": "1.0", "run": {},
+            "events": [
+                {"seq": 0, "kind": "tool_call", "tool": "Editor",
+                 "input": {"secrets/prod.env": "x"}, "call_id": "k1"},
+                {"seq": 1, "kind": "tool_result", "call_id": "k1",
+                 "is_error": False}]}
+    target = tape_dir(tmp_path, names=())
+    (target / "tape_k.json").write_text(json.dumps(tape))
+    out = tmp_path / "observations.json"
+    assert main(["score", str(FIX / "rules_synthetic.md"),
+                 str(target), "-o", str(out)]) == 0
+    document = json.loads(out.read_text())
+    kinds = [o["kind"] for o in document["observations"]
+             if o["rule"] == "Do not edit secrets/prod.env"]
+    assert kinds == ["ignored"]
+
+
+def test_the_golden_tapes_quotes_carry_its_real_digest(tmp_path):
+    document = run(tmp_path, names=("tape_synthetic.json",))
+    # The golden tape holds one Read call on widget.py, which no
+    # rule in the synthetic set governs, so assert through the
+    # tape account instead: the set scores, nothing excluded.
+    assert document["tapes"]["scored"] == 1
+    assert digest_of(json.loads(
+        (FIX / "tape_synthetic.json").read_text())) == GOLDEN
+
+
+def test_stdout_mode_and_refusals(tmp_path, capsys):
+    target = tape_dir(tmp_path)
+    assert main(["score", str(FIX / "rules_synthetic.md"),
+                 str(target)]) == 0
+    document = json.loads(capsys.readouterr().out)
+    assert document["unmeasured_count"] == 1
+    assert main(["score", str(tmp_path / "missing.md"),
+                 str(target)]) == 1
+    assert "no such rules file" in capsys.readouterr().err
+
+
+def test_first_second_call_decides_the_ordering():
+    from unheard.scoring import _exercises
+    shape = {"shape": "ordering", "first": "Lint", "second": "Push"}
+    tape = {"events": [
+        {"seq": 0, "kind": "tool_call", "tool": "Push", "input": {},
+         "call_id": "a"},
+        {"seq": 1, "kind": "tool_call", "tool": "Lint", "input": {},
+         "call_id": "b"},
+        {"seq": 2, "kind": "tool_call", "tool": "Push", "input": {},
+         "call_id": "c"}]}
+    assert list(_exercises(shape, tape)) == [(0, False, "Push")]
+
+
+def test_the_path_appearing_inside_a_longer_string_is_a_touch():
+    from unheard.scoring import _exercises
+    shape = {"shape": "prohibit-path", "path": "secrets/prod.env"}
+    tape = {"events": [
+        {"seq": 0, "kind": "tool_call", "tool": "Read",
+         "input": {"note": "see secrets/prod.env.bak for history"},
+         "call_id": "a"}]}
+    assert [seq for seq, _, _ in _exercises(shape, tape)] == [0]

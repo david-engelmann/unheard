@@ -9,6 +9,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+from .digest import DigestError, digest_of
 from .inventory import InventoryError, parse_rules
 from .scoring import score
 from .tapes import FAILED, load_tape_file
@@ -43,14 +44,15 @@ def _score(args: argparse.Namespace) -> int:
         return 1
     if out is not None and (
             out.resolve() == rules_path.resolve()
-            or (tapes_dir in out.resolve().parents)):
+            or tapes_dir.resolve() in out.resolve().parents
+            or out.resolve() == tapes_dir.resolve()):
         print("error, unheard never writes to its inputs",
               file=sys.stderr)
         return 1
     try:
-        rule_texts = [rule["text"] for rule in
-                      parse_rules(rules_path.read_bytes().decode(
-                          "utf-8-sig"))[0]]
+        rules, warnings = parse_rules(
+            rules_path.read_bytes().decode("utf-8-sig"))
+        rule_texts = [rule["text"] for rule in rules]
     except (OSError, UnicodeDecodeError) as exc:
         print(f"error, cannot read the rules file, {rules_path}",
               file=sys.stderr)
@@ -67,9 +69,18 @@ def _score(args: argparse.Namespace) -> int:
         if tape is FAILED:
             excluded.append({"file": name, "reason": reason,
                              "defects": defects})
-        else:
-            tapes.append(tape)
-    document = score(rule_texts, tapes, excluded)
+            continue
+        try:
+            digest = digest_of(tape)
+        except (DigestError, RecursionError):
+            excluded.append({
+                "file": name,
+                "reason": "cannot be cited under canonical form 1",
+                "defects": ["the tape cannot be digested under "
+                            "canonical form 1"]})
+            continue
+        tapes.append((tape, digest))
+    document = score(rule_texts, tapes, excluded, warnings)
     text = json.dumps(document, indent=2, ensure_ascii=False) + "\n"
     try:
         if out is None:

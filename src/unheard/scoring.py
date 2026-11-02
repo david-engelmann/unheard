@@ -2,16 +2,17 @@
 set and emit the observations document."""
 from __future__ import annotations
 
-from .digest import digest_of
 from .shapes import classify
 
 
 def _strings(value):
-    """Every string value in a call's input, recursively."""
+    """Every string in a call's input, keys and values,
+    recursively (UH-7a: the path appears in the input)."""
     if isinstance(value, str):
         yield value
     elif isinstance(value, dict):
-        for item in value.values():
+        for key, item in value.items():
+            yield from _strings(key)
             yield from _strings(item)
     elif isinstance(value, list):
         for item in value:
@@ -52,14 +53,25 @@ def _exercises(shape: dict, tape: dict):
                        call["tool"])
 
 
-def score(rule_texts: list[str], tapes: list[dict],
-          excluded: list[dict]) -> dict:
+def score(rule_texts: list[str], scored_tapes: list,
+          excluded: list[dict], warnings=()) -> dict:
     observations: list[dict] = []
     scores: list[dict] = []
     unmeasured: list[str] = []
     unexercised: list[str] = []
-    digests = {id(tape): digest_of(tape) for tape in tapes}
+    tapes = [tape for tape, _ in scored_tapes]
+    digests = {id(tape): digest for tape, digest in scored_tapes}
+    seen: set[str] = set()
+    duplicates: list[str] = []
+    distinct_texts: list[str] = []
     for text in rule_texts:
+        if text in seen:
+            if text not in duplicates:
+                duplicates.append(text)
+            continue
+        seen.add(text)
+        distinct_texts.append(text)
+    for text in distinct_texts:
         shape = classify(text)
         if shape is None:
             unmeasured.append(text)
@@ -99,12 +111,17 @@ def score(rule_texts: list[str], tapes: list[dict],
                        "tapes_total": len(tapes),
                        "events_exercised": events_exercised,
                        "violations": violations})
-    return {
-        "observations_version": "1.0",
+    document = {
         "observations": observations,
         "scores": scores,
         "unmeasured": unmeasured,
+        "unmeasured_count": len(unmeasured),
         "unexercised": unexercised,
         "tapes": {"read": len(tapes) + len(excluded),
                   "scored": len(tapes), "excluded": excluded},
     }
+    if duplicates:
+        document["duplicates"] = duplicates
+    if warnings:
+        document["warnings"] = list(warnings)
+    return document

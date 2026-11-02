@@ -9,13 +9,13 @@ PROHIBIT_TOOL = re.compile(
     rf"^(?:Never use|Do not use|Never call|Do not call) {TOOL}\.?$")
 PROHIBIT_PATH = re.compile(
     r"^(?:Never edit|Do not edit|Never modify|Do not modify|"
-    r"Never touch|Do not touch) (\S+)\.?$")
+    r"Never touch|Do not touch) (\S+?)\.?$")
 ORDERING = re.compile(
     rf"^(?:Run|Always run|Call|Always call) {TOOL} before {TOOL}\.?$")
 REQUIRED_TOOL = re.compile(
     rf"^(?:Use|Always use) {TOOL} for (\.\S+) files\.?$")
 REQUIRED_TOOL_ENDING = re.compile(
-    rf"^(?:Use|Always use) {TOOL} for files ending in (\.\S+)\.?$")
+    rf"^(?:Use|Always use) {TOOL} for files ending in (\.\S+?)\.?$")
 
 
 def classify(text: str) -> dict | None:
