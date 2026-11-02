@@ -1,5 +1,6 @@
-"""UH-6, UH-6a. The four checkable shapes, recognized by
-stated patterns over a rule's exact text."""
+"""UH-6, UH-6a, UH-13 to UH-15. The checkable shapes,
+recognized by stated patterns over a rule's exact text,
+tried in contract order."""
 from __future__ import annotations
 
 import re
@@ -16,6 +17,18 @@ REQUIRED_TOOL = re.compile(
     rf"^(?:Use|Always use) {TOOL} for (\.\S+) files\.?$")
 REQUIRED_TOOL_ENDING = re.compile(
     rf"^(?:Use|Always use) {TOOL} for files ending in (\.\S+?)\.?$")
+NUMERAL = r"([0-9]{1,18})"
+CAP = re.compile(
+    rf"^(?:Never call|Do not call) {TOOL} more than {NUMERAL} times\.?$")
+CAP_AT_MOST = re.compile(
+    rf"^(?:Call|Use) {TOOL} at most {NUMERAL} times\.?$")
+CAP_COUNT = re.compile(
+    rf"^At most {NUMERAL} calls to {TOOL}\.?$")
+FIRST = re.compile(
+    rf"^(?:Always start with|Start with|Always begin with|"
+    rf"Begin with) {TOOL}\.?$")
+FIRST_CALL = re.compile(
+    rf"^The first call must be {TOOL}\.?$")
 
 
 def classify(text: str) -> dict | None:
@@ -34,4 +47,15 @@ def classify(text: str) -> dict | None:
     if match:
         return {"shape": "required-tool", "tool": match.group(1),
                 "extension": match.group(2)}
+    match = CAP.match(text) or CAP_AT_MOST.match(text)
+    if match:
+        return {"shape": "cap", "tool": match.group(1),
+                "limit": int(match.group(2))}
+    match = CAP_COUNT.match(text)
+    if match:
+        return {"shape": "cap", "tool": match.group(2),
+                "limit": int(match.group(1))}
+    match = FIRST.match(text) or FIRST_CALL.match(text)
+    if match:
+        return {"shape": "first", "tool": match.group(1)}
     return None
