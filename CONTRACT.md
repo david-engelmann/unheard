@@ -130,3 +130,50 @@ after the reviews, before the repair code).
   the reader's depth) is excluded like any other
   defective tape, with the reason named in the tape
   account. Test, tests/test_scoring.py.
+
+## Round 2. Two more checkable shapes (UH-13 to UH-16)
+
+- UH-13. A fifth shape, the cap: a rule stating a
+  numeric limit on one tool's calls in a session. Its
+  stated patterns are "Never call X more than N times",
+  "Do not call X more than N times", "Call X at most N
+  times", "Use X at most N times", and "At most N calls
+  to X", where X is a tool name and N is decimal digits,
+  the trailing period optional, the whole rule matching
+  and nothing more. A limit written in words is not
+  this shape. The shape's name in the scores is cap,
+  carrying the tool and the limit. Test,
+  tests/test_shapes.py.
+- UH-13a. The cap binds within one tape. Every call of
+  the tool in the tape is an exercise, counted per
+  event like a prohibition (UH-7a): the first N calls
+  in the tape held, each call past N one violation and
+  one ignored observation quoting that call. A limit
+  of zero is a cap like any other; every call violates
+  it. Test, tests/test_scoring.py.
+- UH-14. A sixth shape, the first step: a rule stating
+  which tool opens a session. Its stated patterns are
+  "Always start with X", "Start with X", "Always begin
+  with X", "Begin with X", and "The first call must be
+  X", X a tool name, the trailing period optional, the
+  whole rule matching and nothing more. The shape's
+  name in the scores is first, carrying the tool.
+  Test, tests/test_shapes.py.
+- UH-14a. The first step is exercised once in a tape
+  holding at least one tool call: held when the tape's
+  first tool call is the named tool, one violation and
+  one ignored observation quoting that first call
+  otherwise. A tape with no tool calls exercises
+  nothing, so a set of silent tapes leaves the rule
+  unexercised, never violated. Test,
+  tests/test_scoring.py.
+- UH-15. Classification order is part of the contract:
+  the four Round 1 shapes are tried first, in their
+  Round 1 order, then the cap, then the first step. No
+  rule Round 1 measured changes its shape, and no rule
+  matches two shapes. Test, tests/test_shapes.py.
+- UH-16. Nothing else changes. The output document
+  keeps UH-12a's shape, observations keep UH-8 and
+  UH-8a's forms exactly, and a rule matching none of
+  the six shapes is unmeasured as before. Test,
+  tests/test_scoring.py.
