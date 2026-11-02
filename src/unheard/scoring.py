@@ -44,6 +44,19 @@ def _exercises(shape: dict, tape: dict):
             target = seconds[0]
             held = any(c["seq"] < target["seq"] for c in firsts)
             yield target["seq"], held, target["tool"]
+    elif kind == "cap":
+        count = 0
+        for call in calls:
+            if call["tool"] == shape["tool"]:
+                count += 1
+                yield (call["seq"], count <= shape["limit"],
+                       call["tool"])
+    elif kind == "first":
+        if calls:
+            first = min(calls, key=lambda c: c["seq"])
+            yield (first["seq"],
+                   first["tool"] == shape["tool"],
+                   first["tool"])
     elif kind == "required-tool":
         for call in calls:
             touched = any(s.endswith(shape["extension"])
