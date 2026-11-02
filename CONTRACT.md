@@ -12,8 +12,9 @@ on it lands.
 
 ## Round 1. Obedience scoring for checkable rules (UH-5 to UH-12)
 
-Contract preparation only in this pass. The build opens
-when this repo's turn in the line's build order arrives.
+Built in Round 1, which also added the amendments
+below (UH-5a to UH-12a before code, UH-5b and UH-8b
+after the reviews, before the repair code).
 
 - UH-5. Inputs are a rules file and a directory of
   flighttape tapes at format 1.0, read with the family's
