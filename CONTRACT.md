@@ -114,3 +114,18 @@ when this repo's turn in the line's build order arrives.
   unexercised rules, and the tape set's own account
   (tapes read, tapes scored, tapes excluded with their
   defects named). Test, tests/test_scoring.py.
+
+## Round 1 amendments, after the reviews (recorded before the repair code)
+
+- UH-8b. A rules file may carry the same rule text
+  twice. Each distinct text is scored once, in first
+  occurrence order; the repeated texts are named in
+  the output document's duplicates list, so no event
+  is ever counted twice for one sentence. Test,
+  tests/test_scoring.py.
+- UH-5b. A tape that passes the subset checks but
+  cannot be digested under canonical form 1 (a
+  non-finite number, a lone surrogate, nesting beyond
+  the reader's depth) is excluded like any other
+  defective tape, with the reason named in the tape
+  account. Test, tests/test_scoring.py.
