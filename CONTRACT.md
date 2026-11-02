@@ -65,3 +65,52 @@ when this repo's turn in the line's build order arrives.
   denominators, exercised of total tapes and violations
   of exercised, never as a bare rate. Test,
   tests/test_scoring.py.
+
+## Round 1 amendments, the stated patterns (recorded before code)
+
+- UH-5a. The tape subset is the one the family reads:
+  an object with tape_version 1.0, a run object, and an
+  events array whose seq values run consecutively from
+  0, whose kinds are in the format's enum, and whose
+  tool calls and results satisfy the flighttape FT-4
+  pairing rules. A file failing any check is excluded
+  with its defects named. A tape's digest is its
+  canonical form 1 digest, pinned by the family's
+  golden fixture. Test, tests/test_scoring.py.
+- UH-6a. The four shapes, matched against a rule's exact
+  text with at most a trailing period. Prohibit tool:
+  Never use, Do not use, Never call, or Do not call,
+  then one tool token. Prohibit path: Never edit, Do not
+  edit, Never modify, Do not modify, Never touch, or Do
+  not touch, then one path token. Required ordering:
+  Run, Always run, Call, or Always call, then a tool
+  token, the word before, and a second tool token.
+  Required tool: Use or Always use, then a tool token,
+  the word for, then an extension token beginning with
+  a dot, then the word files; or the words for files
+  ending in, then the extension token. Anything else is
+  unmeasured. Test, tests/test_scoring.py.
+- UH-7a. Exercises are counted per event. For a
+  prohibition, every matching call is one exercise and
+  one violation. For an ordering, the second tool's
+  first call in the tape is the one exercise, held when
+  the first tool was called before it. For a required
+  tool, every call touching a file of the kind is one
+  exercise, held when the tool is the required one. A
+  path is touched when the path string appears in the
+  call's input; a file of a kind is touched when a
+  string value in the call's input ends with the
+  extension. Test, tests/test_scoring.py.
+- UH-8a. An observation's quote is the words tape, the
+  tape's digest, the word seq, and the event's seq. A
+  required-tool violation's quote adds the words used
+  and the tool actually used. One observation per
+  exercised event. Test, tests/test_scoring.py.
+- UH-12a. The output document carries the observations
+  under the key bluepencil's BP-6 reads, plus a scores
+  list in rule order (per rule: its text, its shape or
+  unmeasured, tapes exercised of tapes total, events
+  exercised, violations), the unmeasured rules, the
+  unexercised rules, and the tape set's own account
+  (tapes read, tapes scored, tapes excluded with their
+  defects named). Test, tests/test_scoring.py.
