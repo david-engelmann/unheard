@@ -1,4 +1,5 @@
-"""UH-5 to UH-12. Obedience scoring for checkable rules."""
+"""UH-5 to UH-12, UH-13a, UH-14a, UH-16. Obedience
+scoring for checkable rules."""
 import json
 import shutil
 from pathlib import Path
@@ -313,3 +314,36 @@ def test_the_first_step_holds_violates_and_waits():
     document = _score(["Always start with Lint"], [silent])
     assert document["scores"][0]["events_exercised"] == 0
     assert document["unexercised"] == ["Always start with Lint"]
+
+
+def test_the_cap_counts_every_excess_call():
+    tape = _tape(_call(0, "Push"), _call(1, "Push"),
+                 _call(2, "Push"), _call(3, "Push"))
+    document = _score(["Never call Push more than 1 times"],
+                      [tape])
+    entry = document["scores"][0]
+    assert entry["events_exercised"] == 4
+    assert entry["violations"] == 3
+    seqs = [o["quote"].rsplit(" ", 1)[1]
+            for o in document["observations"]
+            if o["kind"] == "ignored"]
+    assert seqs == ["1", "2", "3"]
+
+
+def test_the_first_step_reads_seq_not_array_order():
+    from unheard.scoring import _exercises
+    shape = {"shape": "first", "tool": "Lint"}
+    tape = {"events": [
+        {"seq": 5, "kind": "tool_call", "tool": "Push",
+         "input": {}, "call_id": "b"},
+        {"seq": 2, "kind": "tool_call", "tool": "Lint",
+         "input": {}, "call_id": "a"}]}
+    assert list(_exercises(shape, tape)) == [(2, True, "Lint")]
+    cap = {"shape": "cap", "tool": "Push", "limit": 1}
+    tape = {"events": [
+        {"seq": 5, "kind": "tool_call", "tool": "Push",
+         "input": {}, "call_id": "b"},
+        {"seq": 3, "kind": "tool_call", "tool": "Push",
+         "input": {}, "call_id": "a"}]}
+    assert list(_exercises(cap, tape)) == [
+        (3, True, "Push"), (5, False, "Push")]

@@ -17,12 +17,13 @@ REQUIRED_TOOL = re.compile(
     rf"^(?:Use|Always use) {TOOL} for (\.\S+) files\.?$")
 REQUIRED_TOOL_ENDING = re.compile(
     rf"^(?:Use|Always use) {TOOL} for files ending in (\.\S+?)\.?$")
+NUMERAL = r"([0-9]{1,18})"
 CAP = re.compile(
-    rf"^(?:Never call|Do not call) {TOOL} more than (\d+) times?\.?$")
+    rf"^(?:Never call|Do not call) {TOOL} more than {NUMERAL} times\.?$")
 CAP_AT_MOST = re.compile(
-    rf"^(?:Call|Use) {TOOL} at most (\d+) times?\.?$")
+    rf"^(?:Call|Use) {TOOL} at most {NUMERAL} times\.?$")
 CAP_COUNT = re.compile(
-    rf"^At most (\d+) calls? (?:of|to) {TOOL}\.?$")
+    rf"^At most {NUMERAL} calls to {TOOL}\.?$")
 FIRST = re.compile(
     rf"^(?:Always start with|Start with|Always begin with|"
     rf"Begin with) {TOOL}\.?$")

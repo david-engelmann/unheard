@@ -8,14 +8,20 @@ def test_the_cap_patterns_are_recognized():
         "shape": "cap", "tool": "Push", "limit": 2}
     assert classify("Do not call Push more than 10 times.") == {
         "shape": "cap", "tool": "Push", "limit": 10}
-    assert classify("Call Push at most 1 time") == {
-        "shape": "cap", "tool": "Push", "limit": 1}
+    assert classify("Call Push at most 2 times") == {
+        "shape": "cap", "tool": "Push", "limit": 2}
     assert classify("Use Push at most 0 times") == {
         "shape": "cap", "tool": "Push", "limit": 0}
     assert classify("At most 3 calls to Push") == {
         "shape": "cap", "tool": "Push", "limit": 3}
-    assert classify("At most 1 call of Push.") == {
+    assert classify("At most 1 calls to Push.") == {
         "shape": "cap", "tool": "Push", "limit": 1}
+    assert classify("Never call Push more than 007 times") == {
+        "shape": "cap", "tool": "Push", "limit": 7}
+    assert classify("Never call Push more than "
+                    "999999999999999999 times") == {
+        "shape": "cap", "tool": "Push",
+        "limit": 999999999999999999}
 
 
 def test_cap_near_misses_stay_unmeasured():
@@ -25,6 +31,13 @@ def test_cap_near_misses_stay_unmeasured():
         "Never call Push more than 2 times on Fridays") is None
     assert classify("Never call Push at most 2 times") is None
     assert classify("At most 2 calls to the Push tool") is None
+    assert classify("Call Push at most 1 time") is None
+    assert classify("At most 1 call of Push") is None
+    assert classify("At most 2 calls of Push") is None
+    assert classify("Never call Push more than "
+                    "9999999999999999999 times") is None
+    assert classify("Never call Push more than "
+                    + "9" * 5000 + " times") is None
 
 
 def test_the_first_step_patterns_are_recognized():
