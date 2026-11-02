@@ -177,3 +177,17 @@ after the reviews, before the repair code).
   UH-8a's forms exactly, and a rule matching none of
   the six shapes is unmeasured as before. Test,
   tests/test_scoring.py.
+
+## Round 2 post-review amendments, recorded before the repairs
+
+- UH-13b. The cap's N is one to eighteen ASCII decimal
+  digits, read at face value, leading zeros standing
+  as ordinary notation. A longer numeral, and digits
+  in any other script, are not this shape, so the rule
+  is unmeasured. Eighteen digits passes any count of
+  events a tape can hold, so no real limit is lost;
+  the bound keeps the numeral convertible on every
+  supported interpreter, where an unbounded one raised
+  an uncaught error and killed the whole run in the
+  reviews' hands, and ASCII keeps the stated pattern
+  surface exact. Test, tests/test_shapes.py.
