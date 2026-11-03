@@ -20,14 +20,17 @@ shape. Setup landed earlier in October 2026.
 
 ## Programme status
 
-- Closed perfection rounds, 2 of 100. A round counts only when a
+- Closed perfection rounds, 3 of 100. A round counts only when a
   full cycle of work, audit, review, red team, and approval has
   closed.
 - Contract, UH-1 to UH-12 as amended, met for the Round 1 scope.
   UH-13 to UH-16 with amendment UH-13b, written ahead of
-  the code and met in Round 2.
+  the code and met in Round 2. UH-17 to UH-24, the Rust
+  port obligations, written ahead of the port and met in
+  Round 3.
 - Local gate, python3 scripts/codepoint_scan.py and
-  python3 -m pytest tests -q. CI runs the same commands.
+  cargo test. CI runs the same commands, with fmt and
+  clippy ahead of the tests.
 
 ## Licence
 
