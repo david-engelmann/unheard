@@ -191,3 +191,99 @@ after the reviews, before the repair code).
   an uncaught error and killed the whole run in the
   reviews' hands, and ASCII keeps the stated pattern
   surface exact. Test, tests/test_shapes.py.
+
+## Round 3. The Rust port (UH-17 to UH-24)
+
+Round 3 ports unheard to Rust. The Python on main at
+03658d9 is the behavioral spec; the port reproduces
+its behavior exactly, and every place exact
+reproduction is impossible or a crash of the
+interpreter is the behavior is named as a deviation
+in the round dossier.
+
+- UH-17. Exact behavior is the obligation: both
+  refusal orders and texts, the argparse surface,
+  error text, exit codes, and output bytes are the
+  Python's, including the crash class, the cases
+  where the interpreter dies with a traceback (the
+  output guard resolving a path through a symlink
+  loop among them) and the port exits 1 silently.
+  Test, the whole ported suite and the differential
+  harness.
+- UH-18. Library crate plus a thin binary, the
+  family shape. No sibling crate is consumed: the
+  flighttape crate's reader counts a deeply nested
+  file whole and so cannot mirror this surface's
+  parse refusal (UH-19), and the format is consumed
+  pinned by the golden digest exactly as digest.py
+  consumed it, by re-implementation under the
+  golden test. The only dependency is sha2. Cargo
+  tests are the primary suite. No Python bindings
+  are offered; unheard is a process-boundary CLI
+  and no Python consumer exists. Tests,
+  tests/test_scoring.rs and tests/test_shapes.rs.
+- UH-19. The tape reader is one strict iterative
+  JSON reader whose refusals are decided in parse
+  order: a file nested past 9994 containers in
+  total is not valid JSON, and an integer literal
+  past 4300 digits as written is a number too
+  large to read, whichever the text reaches first.
+  Duplicate keys keep the last value at the first
+  key's position; NaN and Infinity read as floats;
+  the minus zero literal normalizes. Tape bytes
+  decode as strict UTF-8 with no signature
+  stripping; a decode failure names the file not
+  valid UTF-8, and an unreadable file cannot be
+  read. Test, tests/test_scoring.rs.
+- UH-20. Tape defects are computed in the Python's
+  order with its phrases: the object, version, run,
+  and events checks; an empty events array ends
+  the checks; per event the seq, kind, and pairing
+  checks, with a call id's repr rendered as
+  CPython renders it. Sidechain events are checked
+  like any other and stay invisible to the shapes,
+  as Rounds 1 and 2 carried. Test,
+  tests/test_scoring.rs.
+- UH-21. A scored tape is cited by its canonical
+  form 1 digest, computed locally with CPython
+  repr-exact digits over the value model. The
+  digest refuses, and the tape is excluded as
+  unable to be cited, on a non-finite number, on
+  text that cannot be encoded, or on a value
+  nested past 992 containers in total. The golden
+  fixture digest stands pinned. Test,
+  tests/test_scoring.rs.
+- UH-22. The rules file parses under the same
+  inventory discipline bluepencil uses, the shared
+  synthetic fixture carrying the same expectation
+  in both suites. The file decodes as utf-8-sig;
+  a read or decode failure is the named cannot
+  read refusal, and an inventory refusal is named.
+  Test, tests/test_scoring.rs.
+- UH-23. The six shapes classify by hand matchers
+  reproducing the stated patterns exactly, in
+  contract order: the tool token, the lazy path
+  token, the extension runs, the cap numeral at
+  one to eighteen ASCII digits (UH-13b), and the
+  end anchor's trailing newline rule. Scoring
+  follows UH-7 to UH-16: exercises per event,
+  quotes naming tape digest and seq, duplicates
+  scored once and named, the document's field
+  order, tapes iterated in filename order with
+  directories and non-files skipped. The same
+  tape filed twice counts twice, as carried.
+  Tests, tests/test_scoring.rs and
+  tests/test_shapes.rs.
+- UH-24. The command surface is one subcommand,
+  score, with argparse behavior pinned at 80
+  columns. The output guard compares resolved
+  paths (the output naming the rules file, the
+  tapes directory, or a path inside it), and an
+  unresolvable path is the crash class of UH-17.
+  The document renders before any temporary file
+  exists; the write is mkstemp-shaped and atomic.
+  All 28 Python tests are ported file for file,
+  and a differential harness exercises the whole
+  command surface against the Python. The port
+  report stands in the round dossier. Tests,
+  tests/test_scoring.rs and tests/test_shapes.rs.
