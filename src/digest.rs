@@ -26,18 +26,26 @@
 //! or a key, which the Python's UTF-16BE sort key
 //! refuses the same way), an integer past the
 //! interpreter's digit limit, or a value nested
-//! past 992 containers in total, standing in for
-//! the interpreter recursion limit the Python's
-//! renderer hits (UH-21).
+//! past the renderer's depth budgets, 991 for an
+//! object and 992 containers in total, standing
+//! in for the interpreter recursion limit the
+//! Python's renderer hits, which charges an
+//! object one frame more than an array (UH-21).
 
 use sha2::{Digest, Sha256};
 
 use crate::emit::{escape_string, py_float, Mode};
 use crate::value::{Text, Value};
 
-/// The deepest container nesting a render may
-/// reach, the root counting as one (UH-21).
-const CONTAINER_LIMIT: usize = 992;
+/// The depth budgets of a render, the root
+/// counting as one (UH-21): an object may stand
+/// at depth 991 at most, and no container past
+/// 992 in total. The split stands in for the
+/// interpreter recursion limit the Python's
+/// renderer hits, whose object arm spends one
+/// more frame than its array arm.
+const OBJECT_LIMIT: usize = 991;
+const TOTAL_LIMIT: usize = 992;
 
 #[derive(Debug)]
 pub struct DigestError;
@@ -109,7 +117,7 @@ impl Renderer<'_> {
     /// Render one value. `containers` counts the
     /// containers standing around it; a container
     /// the value opens counts itself, and one that
-    /// would stand past the limit refuses.
+    /// would stand past its budget refuses.
     fn render(&mut self, value: &Value, containers: usize) -> Result<(), DigestError> {
         match value {
             Value::Null => self.out.extend_from_slice(b"null"),
@@ -139,7 +147,7 @@ impl Renderer<'_> {
             }
             Value::Array(items) => {
                 let depth = containers + 1;
-                if depth > CONTAINER_LIMIT {
+                if depth > TOTAL_LIMIT {
                     return Err(DigestError);
                 }
                 self.out.push(b'[');
@@ -153,7 +161,7 @@ impl Renderer<'_> {
             }
             Value::Object(entries) => {
                 let depth = containers + 1;
-                if depth > CONTAINER_LIMIT {
+                if depth > OBJECT_LIMIT {
                     return Err(DigestError);
                 }
                 // The Python sorts keys by their

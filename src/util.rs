@@ -206,18 +206,6 @@ impl Msg {
         self.0.extend(text.encode_utf16());
     }
 
-    pub fn push_text(&mut self, text: &Text) {
-        self.0.extend_from_slice(text.units());
-    }
-
-    pub fn push_units(&mut self, units: &[u16]) {
-        self.0.extend_from_slice(units);
-    }
-
-    pub fn push_msg(&mut self, other: &Msg) {
-        self.0.extend_from_slice(&other.0);
-    }
-
     pub fn render_stderr(&self) -> String {
         stderr_render(&self.0)
     }
@@ -339,26 +327,6 @@ pub fn text_from_scalars(scalars: &[u32]) -> Text {
         }
     }
     Text::from_units(units)
-}
-
-/// The number of code points in a text, the Python's
-/// len of the string: surrogate pairs count once.
-pub fn scalar_count(units: &[u16]) -> usize {
-    scalars_of(units).len()
-}
-
-/// The first `count` code points of a text, the
-/// Python's slice of that length.
-pub fn truncate_text(text: &Text, count: usize) -> Text {
-    let units = text.units();
-    let mut end = 0;
-    let mut taken = 0;
-    while end < units.len() && taken < count {
-        let (span, _) = step_at(units, end);
-        end += span;
-        taken += 1;
-    }
-    Text::from_units(units[..end].to_vec())
 }
 
 /// Whether a scalar ends a line for str.splitlines:

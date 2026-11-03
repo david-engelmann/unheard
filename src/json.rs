@@ -1,15 +1,15 @@
 //! The JSON reader (UH-19): a strict iterative
 //! scanner over the decoded text, deciding every
 //! refusal in text order, as CPython's json.loads
-//! does. It reports errors in the interpreter's own
-//! terms; the tape loader collapses every one but
-//! the integer limit to its one named refusal.
-//! Duplicate keys follow Python dictionary
-//! assignment: the last value wins, the first key
-//! position is retained. Integers keep their exact
-//! digits, a literal past 4300 digits refuses with
-//! the interpreter's limit text, and NaN and the
-//! infinities read as floats.
+//! does. Its error type carries only the one
+//! distinction its consumer names: an integer
+//! literal past the digit limit stands apart, and
+//! the tape loader collapses every other refusal
+//! to its one named refusal. Duplicate keys
+//! follow Python dictionary assignment: the last
+//! value wins, the first key position is
+//! retained. Integers keep their exact digits,
+//! and NaN and the infinities read as floats.
 
 use crate::value::{Text, Value};
 
@@ -25,85 +25,16 @@ pub(crate) const INT_DIGIT_LIMIT: usize = 4300;
 
 #[derive(Debug, PartialEq)]
 pub enum JsonError {
-    /// A syntax refusal with CPython's message and
-    /// the character position it names.
-    Syntax { msg: &'static str, pos: usize },
-    /// A string that never closes.
-    Unterminated { start: usize },
-    /// A backslash escape outside the JSON set.
-    InvalidEscape { pos: usize },
-    /// A malformed unicode escape, its position at
-    /// the escape's u.
-    InvalidUnicode { pos: usize },
-    /// A raw control character inside a string.
-    InvalidControl { pos: usize },
-    /// An integer literal past the digit limit.
-    IntTooLong { digits: usize },
-    /// The container that would open past the
-    /// nesting limit, and its kind for the recursion
-    /// wording.
-    Depth { object: bool },
-}
-
-fn line_col(source: &[u32], pos: usize) -> (usize, usize) {
-    let mut line = 1usize;
-    let mut last_newline: Option<usize> = None;
-    for (index, &scalar) in source.iter().enumerate().take(pos) {
-        if scalar == 0x0A {
-            line += 1;
-            last_newline = Some(index);
-        }
-    }
-    let col = match last_newline {
-        None => pos + 1,
-        Some(index) => pos - index,
-    };
-    (line, col)
-}
-
-impl JsonError {
-    /// The CPython exception text for this refusal:
-    /// what json.loads raises, as a string.
-    pub fn describe(&self, source: &[u32]) -> String {
-        match self {
-            JsonError::IntTooLong { digits } => format!(
-                "Exceeds the limit (4300 digits) for integer string conversion: \
-                 value has {digits} digits; use sys.set_int_max_str_digits() \
-                 to increase the limit"
-            ),
-            JsonError::Depth { object } => format!(
-                "maximum recursion depth exceeded while decoding a JSON {} \
-                 from a unicode string",
-                if *object { "object" } else { "array" }
-            ),
-            JsonError::Syntax { msg, pos } => {
-                let (line, col) = line_col(source, *pos);
-                format!("{msg}: line {line} column {col} (char {pos})")
-            }
-            JsonError::Unterminated { start } => {
-                let (line, col) = line_col(source, *start);
-                format!(
-                    "Unterminated string starting at: line {line} column {col} \
-                     (char {start})"
-                )
-            }
-            JsonError::InvalidEscape { pos } => {
-                let (line, col) = line_col(source, *pos);
-                format!("Invalid \\escape: line {line} column {col} (char {pos})")
-            }
-            JsonError::InvalidUnicode { pos } => {
-                let (line, col) = line_col(source, *pos);
-                format!("Invalid \\uXXXX escape: line {line} column {col} (char {pos})")
-            }
-            JsonError::InvalidControl { pos } => {
-                let (line, col) = line_col(source, *pos);
-                format!(
-                    "Invalid control character at: line {line} column {col} \
-                     (char {pos})"
-                )
-            }
-        }
-    }
+    /// Any refusal the tape loader names only as
+    /// not valid JSON: a syntax error, a string
+    /// unterminated or holding a bad escape or a
+    /// raw control character, or a container that
+    /// would open past the nesting limit.
+    Invalid,
+    /// An integer literal past the digit limit,
+    /// the one refusal the tape loader names apart
+    /// from the rest.
+    IntTooLong,
 }
 
 enum Frame {
@@ -150,15 +81,12 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    fn literal(&mut self, word: &str, start: usize) -> Result<Value, JsonError> {
+    fn literal(&mut self, word: &str) -> Result<Value, JsonError> {
         let letters: Vec<u32> = word.chars().map(|c| c as u32).collect();
         if self.chars.len() - self.at < letters.len()
             || self.chars[self.at..self.at + letters.len()] != letters[..]
         {
-            return Err(JsonError::Syntax {
-                msg: "Expecting value",
-                pos: start,
-            });
+            return Err(JsonError::Invalid);
         }
         self.at += letters.len();
         Ok(match word {
@@ -186,26 +114,25 @@ impl<'a> Scanner<'a> {
                     Some(0x61..=0x66) => digit.expect("a digit") - 0x61 + 10,
                     Some(0x41..=0x46) => digit.expect("a digit") - 0x41 + 10,
                     _ => {
-                        return Err(JsonError::InvalidUnicode { pos: upos });
+                        return Err(JsonError::Invalid);
                     }
                 };
         }
         self.at = upos + 5;
         if self.at == self.chars.len() {
-            return Err(JsonError::InvalidUnicode { pos: upos });
+            return Err(JsonError::Invalid);
         }
         Ok(value as u16)
     }
 
     fn string(&mut self) -> Result<Text, JsonError> {
         // The caller has seen the opening quote.
-        let start = self.at;
         self.at += 1;
         let mut out: Vec<u16> = Vec::new();
         loop {
             let scalar = match self.peek() {
                 Some(scalar) => scalar,
-                None => return Err(JsonError::Unterminated { start }),
+                None => return Err(JsonError::Invalid),
             };
             match scalar {
                 0x22 => {
@@ -213,11 +140,10 @@ impl<'a> Scanner<'a> {
                     return Ok(Text::from_units(out));
                 }
                 0x5C => {
-                    let slash = self.at;
                     self.at += 1;
                     let escape = match self.peek() {
                         Some(escape) => escape,
-                        None => return Err(JsonError::Unterminated { start }),
+                        None => return Err(JsonError::Invalid),
                     };
                     match escape {
                         0x22 => out.push(0x22),
@@ -246,12 +172,12 @@ impl<'a> Scanner<'a> {
                             }
                             continue;
                         }
-                        _ => return Err(JsonError::InvalidEscape { pos: slash }),
+                        _ => return Err(JsonError::Invalid),
                     }
                     self.at += 1;
                 }
                 0x00..=0x1F => {
-                    return Err(JsonError::InvalidControl { pos: self.at });
+                    return Err(JsonError::Invalid);
                 }
                 _ => {
                     if scalar < 0x10000 {
@@ -282,10 +208,7 @@ impl<'a> Scanner<'a> {
                 }
             }
             _ => {
-                return Err(JsonError::Syntax {
-                    msg: "Expecting value",
-                    pos: start,
-                })
+                return Err(JsonError::Invalid);
             }
         }
         let int_digits = self.chars[start..self.at]
@@ -321,13 +244,10 @@ impl<'a> Scanner<'a> {
             token
                 .parse::<f64>()
                 .map(Value::Float)
-                .map_err(|_| JsonError::Syntax {
-                    msg: "Expecting value",
-                    pos: start,
-                })
+                .map_err(|_| JsonError::Invalid)
         } else {
             if int_digits > INT_DIGIT_LIMIT {
-                return Err(JsonError::IntTooLong { digits: int_digits });
+                return Err(JsonError::IntTooLong);
             }
             // CPython's int reading drops the sign of
             // zero: -0 is the integer 0.
@@ -375,10 +295,7 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
     // A leading byte order mark is its own refusal
     // in the interpreter, before any scanning.
     if source.first() == Some(&0xFEFF) {
-        return Err(JsonError::Syntax {
-            msg: "Unexpected UTF-8 BOM (decode using utf-8-sig)",
-            pos: 0,
-        });
+        return Err(JsonError::Invalid);
     }
     let mut scanner = Scanner {
         chars: source,
@@ -390,15 +307,9 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
         match mode {
             Mode::Value | Mode::FirstValue => {
                 scanner.skip_ws();
-                let at = scanner.at;
                 let scalar = match scanner.peek() {
                     Some(scalar) => scalar,
-                    None => {
-                        return Err(JsonError::Syntax {
-                            msg: "Expecting value",
-                            pos: at,
-                        })
-                    }
+                    None => return Err(JsonError::Invalid),
                 };
                 if mode == Mode::FirstValue && scalar == 0x5D {
                     scanner.at += 1;
@@ -406,10 +317,7 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                     if let Some(done) = attach(&mut stack, close_frame(frame)) {
                         scanner.skip_ws();
                         if scanner.at != source.len() {
-                            return Err(JsonError::Syntax {
-                                msg: "Extra data",
-                                pos: scanner.at,
-                            });
+                            return Err(JsonError::Invalid);
                         }
                         return Ok(done);
                     }
@@ -419,7 +327,7 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                 let value = match scalar {
                     0x7B => {
                         if stack.len() >= DEPTH_LIMIT {
-                            return Err(JsonError::Depth { object: true });
+                            return Err(JsonError::Invalid);
                         }
                         scanner.at += 1;
                         stack.push(Frame::Object {
@@ -431,7 +339,7 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                     }
                     0x5B => {
                         if stack.len() >= DEPTH_LIMIT {
-                            return Err(JsonError::Depth { object: false });
+                            return Err(JsonError::Invalid);
                         }
                         scanner.at += 1;
                         stack.push(Frame::Array(Vec::new()));
@@ -439,33 +347,27 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                         continue 'outer;
                     }
                     0x22 => Value::Str(scanner.string()?),
-                    0x74 => scanner.literal("true", at)?,
-                    0x66 => scanner.literal("false", at)?,
-                    0x6E => scanner.literal("null", at)?,
-                    0x4E => scanner.literal("NaN", at)?,
-                    0x49 => scanner.literal("Infinity", at)?,
+                    0x74 => scanner.literal("true")?,
+                    0x66 => scanner.literal("false")?,
+                    0x6E => scanner.literal("null")?,
+                    0x4E => scanner.literal("NaN")?,
+                    0x49 => scanner.literal("Infinity")?,
                     0x2D => {
                         if scanner.peek_at(1) == Some(0x49) {
-                            scanner.literal("-Infinity", at)?
+                            scanner.literal("-Infinity")?
                         } else {
                             scanner.number()?
                         }
                     }
                     0x30..=0x39 => scanner.number()?,
                     _ => {
-                        return Err(JsonError::Syntax {
-                            msg: "Expecting value",
-                            pos: at,
-                        })
+                        return Err(JsonError::Invalid);
                     }
                 };
                 if let Some(done) = attach(&mut stack, value) {
                     scanner.skip_ws();
                     if scanner.at != source.len() {
-                        return Err(JsonError::Syntax {
-                            msg: "Extra data",
-                            pos: scanner.at,
-                        });
+                        return Err(JsonError::Invalid);
                     }
                     return Ok(done);
                 }
@@ -473,7 +375,6 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
             }
             Mode::Key { first } => {
                 scanner.skip_ws();
-                let at = scanner.at;
                 match scanner.peek() {
                     Some(0x7D) if first => {
                         scanner.at += 1;
@@ -481,10 +382,7 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                         if let Some(done) = attach(&mut stack, close_frame(frame)) {
                             scanner.skip_ws();
                             if scanner.at != source.len() {
-                                return Err(JsonError::Syntax {
-                                    msg: "Extra data",
-                                    pos: scanner.at,
-                                });
+                                return Err(JsonError::Invalid);
                             }
                             return Ok(done);
                         }
@@ -498,27 +396,20 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                         mode = Mode::Colon;
                     }
                     _ => {
-                        return Err(JsonError::Syntax {
-                            msg: "Expecting property name enclosed in double quotes",
-                            pos: at,
-                        })
+                        return Err(JsonError::Invalid);
                     }
                 }
             }
             Mode::Colon => {
                 scanner.skip_ws();
                 if scanner.peek() != Some(0x3A) {
-                    return Err(JsonError::Syntax {
-                        msg: "Expecting ':' delimiter",
-                        pos: scanner.at,
-                    });
+                    return Err(JsonError::Invalid);
                 }
                 scanner.at += 1;
                 mode = Mode::Value;
             }
             Mode::AfterValue => {
                 scanner.skip_ws();
-                let at = scanner.at;
                 let is_object = matches!(stack.last(), Some(Frame::Object { .. }));
                 match (is_object, scanner.peek()) {
                     (false, Some(0x2C)) => {
@@ -535,20 +426,14 @@ pub fn parse(source: &[u32]) -> Result<Value, JsonError> {
                         if let Some(done) = attach(&mut stack, close_frame(frame)) {
                             scanner.skip_ws();
                             if scanner.at != source.len() {
-                                return Err(JsonError::Syntax {
-                                    msg: "Extra data",
-                                    pos: scanner.at,
-                                });
+                                return Err(JsonError::Invalid);
                             }
                             return Ok(done);
                         }
                         mode = Mode::AfterValue;
                     }
                     _ => {
-                        return Err(JsonError::Syntax {
-                            msg: "Expecting ',' delimiter",
-                            pos: at,
-                        })
+                        return Err(JsonError::Invalid);
                     }
                 }
             }

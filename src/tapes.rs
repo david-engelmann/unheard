@@ -185,7 +185,7 @@ pub fn load_tape_file(path: &Path) -> TapeLoad {
     let scalars: Vec<u32> = text.chars().map(|ch| ch as u32).collect();
     let tape = match json::parse(&scalars) {
         Ok(value) => value,
-        Err(JsonError::IntTooLong { .. }) => {
+        Err(JsonError::IntTooLong) => {
             return TapeLoad::Failed("the file holds a number too large to read", Vec::new());
         }
         Err(_) => return TapeLoad::Failed("the file is not valid JSON", Vec::new()),

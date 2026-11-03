@@ -7,8 +7,5 @@ license = "MIT"
 [dependencies]
 sha2 = "0.10"
 
-[dev-dependencies]
-sha2 = "0.10"
-
 [profile.dev]
 debug = 0
