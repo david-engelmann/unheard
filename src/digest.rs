@@ -25,27 +25,32 @@
 //! cannot be encoded (a lone surrogate in a string
 //! or a key, which the Python's UTF-16BE sort key
 //! refuses the same way), an integer past the
-//! interpreter's digit limit, or a value nested
-//! past the renderer's depth budgets, 991 for an
-//! object and 992 containers in total, standing
-//! in for the interpreter recursion limit the
-//! Python's renderer hits, which charges an
-//! object one frame more than an array (UH-21).
+//! interpreter's digit limit, or a value whose
+//! render peak passes the renderer's budget
+//! (UH-21). The peak stands in for the
+//! interpreter recursion limit the Python's
+//! renderer hits: every node carries a peak of
+//! its depth plus the extra its own rendering
+//! costs, two for a string (rendered through a
+//! nested encoder call), one for a float
+//! (rendered through a helper call), two for an
+//! object holding at least one key (its keys
+//! render through the nested encoder call), and
+//! nothing for anything else, and a peak past
+//! 993 refuses.
 
 use sha2::{Digest, Sha256};
 
 use crate::emit::{escape_string, py_float, Mode};
 use crate::value::{Text, Value};
 
-/// The depth budgets of a render, the root
-/// counting as one (UH-21): an object may stand
-/// at depth 991 at most, and no container past
-/// 992 in total. The split stands in for the
-/// interpreter recursion limit the Python's
-/// renderer hits, whose object arm spends one
-/// more frame than its array arm.
-const OBJECT_LIMIT: usize = 991;
-const TOTAL_LIMIT: usize = 992;
+/// The peak budget of a render (UH-21): the
+/// root counts as depth one, every node's peak
+/// is its depth plus its rendering extra (see
+/// the module doc), and a peak past this budget
+/// refuses. It stands in for the interpreter
+/// recursion limit the Python's renderer hits.
+const PEAK_LIMIT: usize = 993;
 
 #[derive(Debug)]
 pub struct DigestError;
@@ -114,11 +119,26 @@ struct Renderer<'a> {
 }
 
 impl Renderer<'_> {
-    /// Render one value. `containers` counts the
-    /// containers standing around it; a container
-    /// the value opens counts itself, and one that
-    /// would stand past its budget refuses.
-    fn render(&mut self, value: &Value, containers: usize) -> Result<(), DigestError> {
+    /// Render one value standing at `depth`, the
+    /// root counting as one. A node whose peak,
+    /// its depth plus its rendering extra, passes
+    /// the budget refuses before it renders.
+    fn render(&mut self, value: &Value, depth: usize) -> Result<(), DigestError> {
+        let extra = match value {
+            // A string renders through a nested
+            // encoder call.
+            Value::Str(_) => 2,
+            // A float renders through a helper call.
+            Value::Float(_) => 1,
+            // An object holding at least one key
+            // renders its keys through the nested
+            // encoder call; an empty object does not.
+            Value::Object(entries) if !entries.is_empty() => 2,
+            _ => 0,
+        };
+        if depth + extra > PEAK_LIMIT {
+            return Err(DigestError);
+        }
         match value {
             Value::Null => self.out.extend_from_slice(b"null"),
             Value::Bool(true) => self.out.extend_from_slice(b"true"),
@@ -146,24 +166,16 @@ impl Renderer<'_> {
                     .extend_from_slice(render_number(*number).as_bytes());
             }
             Value::Array(items) => {
-                let depth = containers + 1;
-                if depth > TOTAL_LIMIT {
-                    return Err(DigestError);
-                }
                 self.out.push(b'[');
                 for (index, item) in items.iter().enumerate() {
                     if index > 0 {
                         self.out.push(b',');
                     }
-                    self.render(item, depth)?;
+                    self.render(item, depth + 1)?;
                 }
                 self.out.push(b']');
             }
             Value::Object(entries) => {
-                let depth = containers + 1;
-                if depth > OBJECT_LIMIT {
-                    return Err(DigestError);
-                }
                 // The Python sorts keys by their
                 // UTF-16BE encoding; a lone surrogate
                 // key fails that encode, which is its
@@ -183,7 +195,7 @@ impl Renderer<'_> {
                     }
                     escape_string(key, Mode::Strict, self.out).map_err(|_| DigestError)?;
                     self.out.push(b':');
-                    self.render(item, depth)?;
+                    self.render(item, depth + 1)?;
                 }
                 self.out.push(b'}');
             }
@@ -215,7 +227,7 @@ fn key_is_encodable(text: &Text) -> bool {
 pub fn canonical_bytes(value: &Value) -> Result<Vec<u8>, DigestError> {
     let mut out = Vec::new();
     let mut renderer = Renderer { out: &mut out };
-    renderer.render(value, 0)?;
+    renderer.render(value, 1)?;
     Ok(out)
 }
 
