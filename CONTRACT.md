@@ -287,3 +287,34 @@ in the round dossier.
   command surface against the Python. The port
   report stands in the round dossier. Tests,
   tests/test_scoring.rs and tests/test_shapes.rs.
+- UH-25. Round 4 settles the output guard's
+  remaining shapes against the oracle. The
+  cancelled loop and the dangling family (single
+  link and chains) are probed at the oracle CLI:
+  this oracle's guard lets pathlib's resolve
+  raise uncaught on a genuine loop (the crash
+  class named in UH-21), and the port takes the
+  oracle's outcome on every shape, repairing
+  toward the finished-path and iterated-splice
+  forms its siblings reached where it diverges.
+  Whether the oracle's guard also wraps an
+  exists() arm (bluepencil's BP-27a shape) is
+  read from its source and probed, and mirrored
+  if present.
+- UH-26. The hardlink question is decided and
+  recorded: the oracle's guard carries no
+  file-identity arm, and a hardlinked output
+  overwrites the rules file on both twins. The
+  port stays faithful; no identity arm is added,
+  because this repo's contract is exact
+  reproduction and the divergence would be a
+  behavior change wearing a repair's clothes.
+  The shape is pinned by a harness cell so any
+  future change is deliberate, and this clause
+  is the decision record.
+- UH-27. The round's verification is the full
+  local gate plus the differential harness at
+  zero failures, the new cells included.
+  CodeRabbit's advisory pass on Round 3's PR 4
+  posted no findings (zero entries on the review
+  endpoints), so no disposition is owed from it.
