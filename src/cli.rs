@@ -824,14 +824,19 @@ fn joinrealpath(
     Some((path, true))
 }
 
+/// The guard's resolve: a relative spelling is
+/// anchored at the working directory before the
+/// walk. A working directory that cannot be read
+/// (a deleted cwd) fails the resolution, read as
+/// None, the way the interpreter's uncaught raise
+/// out of getcwd aborts its resolve (UH-28); an
+/// absolute spelling never consults it.
 fn resolve_units(units: &[u16]) -> Option<Vec<u16>> {
     let raw = crate::util::os_path_from_units(units);
     let absolute = if raw.is_absolute() {
         raw
     } else {
-        std::env::current_dir()
-            .unwrap_or_else(|_| PathBuf::from("/"))
-            .join(raw)
+        std::env::current_dir().ok()?.join(raw)
     };
     let spelling = crate::util::os_bytes(absolute.as_os_str());
     let mut seen = std::collections::HashMap::new();
