@@ -655,19 +655,174 @@ fn normalize_path(units: &[u16]) -> Vec<u16> {
 }
 
 /// A path resolved the way pathlib's resolve
-/// reads: the longest existing prefix is
-/// canonicalized, the rest is appended and then
-/// normalized lexically, a dot component dropping
-/// and a dot-dot popping the component before it,
-/// whatever kind of component that is. Resolution
-/// fails outright (None) where the interpreter's
-/// resolve raises: a symlink loop in any component,
-/// the ELOOP the kernel reports, which the output
-/// guard reads as the interpreter's crash (UH-17,
-/// UH-24).
+/// reads (UH-25): the interpreter's realpath walk,
+/// component by component over the resolved
+/// prefix. A component that is a symlink hands
+/// the walk its target spelling, resolved against
+/// the prefix the link stands in, and the walk
+/// continues against the splice, however long the
+/// chain; a dangling final link therefore lands
+/// the resolution on its target spelling rather
+/// than on its own name. A dot component drops
+/// and a dot-dot pops the component before it in
+/// the resolved prefix, whatever kind of
+/// component that is, so a loop component a
+/// following dot-dot cancels never survives to be
+/// followed. A link met again while its own
+/// resolution is still open is a loop: the walk
+/// leaves that component and the rest of the
+/// spelling standing in the result unresolved.
+/// The walk itself raises nothing. Two failures
+/// end a resolution, both read by the output
+/// guard as the interpreter's crash (UH-17,
+/// UH-24). One is depth: the interpreter runs the
+/// walk recursively, one frame per nested
+/// splice, and a call nested past the budget
+/// below raises RecursionError out of resolve(),
+/// so the walk fails there too. The other is the
+/// closing stat of resolve(): the finished path
+/// is stat'ed whole, and the ELOOP the kernel
+/// reports there fails the resolution outright.
+/// No other stat failure fails it.
 /// The kernel's symlink-loop errno on this
 /// platform family.
 const ELOOP: i32 = 40;
+
+/// The walk's recursion budget (UH-25a): at the
+/// shipped CLI the interpreter's default
+/// recursion limit leaves room for 990 nested
+/// splices, and the 991st raises RecursionError.
+/// The count is of nesting depth, not of splices
+/// in total: the top call of a resolution stands
+/// at depth 0 and each splice's call stands one
+/// deeper, so a spelling carrying two sequential
+/// chains nests only as deep as the deeper one.
+const MAX_WALK_DEPTH: usize = 990;
+
+/// os.path.join on byte strings: an absolute
+/// second part stands alone, an empty or
+/// separator-ending first part takes the second
+/// as it is, anything else joins on a separator.
+fn join_bytes(first: &[u8], second: &[u8]) -> Vec<u8> {
+    if second.first() == Some(&0x2F) {
+        return second.to_vec();
+    }
+    let mut out = first.to_vec();
+    if !out.is_empty() && !out.ends_with(b"/") {
+        out.push(0x2F);
+    }
+    out.extend_from_slice(second);
+    out
+}
+
+/// os.path.split on byte strings: the head is
+/// everything up to the last separator, trailing
+/// separators stripped unless the head is nothing
+/// but separators, and the tail is what follows.
+fn split_bytes(path: &[u8]) -> (Vec<u8>, Vec<u8>) {
+    let index = path
+        .iter()
+        .rposition(|byte| *byte == 0x2F)
+        .map_or(0, |i| i + 1);
+    let (mut head, tail) = (path[..index].to_vec(), path[index..].to_vec());
+    if !head.is_empty() && !head.iter().all(|byte| *byte == 0x2F) {
+        while head.ends_with(b"/") {
+            head.pop();
+        }
+    }
+    (head, tail)
+}
+
+/// A transient path over raw bytes, for the
+/// walk's stats and link reads.
+fn path_from_bytes(bytes: &[u8]) -> PathBuf {
+    crate::util::os_path_from_units(&fsdecode_units(bytes))
+}
+
+/// The interpreter's realpath walk itself
+/// (posixpath._joinrealpath with strict=False):
+/// `path` is the resolved prefix, `rest` the
+/// spelling still to walk, and `seen` the links
+/// already met, an open entry (None) marking a
+/// resolution still in progress and a finished
+/// one carrying its result. `depth` is the
+/// nesting of this call, the top call of a
+/// resolution standing at 0; a call entered past
+/// MAX_WALK_DEPTH aborts the walk, read here as
+/// None, the way the interpreter's RecursionError
+/// aborts the resolution (UH-25a). Returns the
+/// resolved prefix and whether the walk
+/// completed; a link whose target bytes cannot
+/// be read aborts the walk the way the
+/// interpreter's uncaught raise does, likewise
+/// read as None.
+fn joinrealpath(
+    mut path: Vec<u8>,
+    rest: Vec<u8>,
+    seen: &mut std::collections::HashMap<Vec<u8>, Option<Vec<u8>>>,
+    depth: usize,
+) -> Option<(Vec<u8>, bool)> {
+    if depth > MAX_WALK_DEPTH {
+        return None;
+    }
+    let mut rest: &[u8] = &rest;
+    if rest.first() == Some(&0x2F) {
+        rest = &rest[1..];
+        path = vec![0x2F];
+    }
+    while !rest.is_empty() {
+        let (name, tail) = match rest.iter().position(|byte| *byte == 0x2F) {
+            Some(index) => (&rest[..index], &rest[index + 1..]),
+            None => (rest, &rest[rest.len()..]),
+        };
+        rest = tail;
+        if name.is_empty() || name == b"." {
+            continue;
+        }
+        if name == b".." {
+            if !path.is_empty() {
+                let (head, popped) = split_bytes(&path);
+                path = head;
+                if popped == b".." {
+                    path = join_bytes(&join_bytes(&path, b".."), b"..");
+                }
+            } else {
+                path = b"..".to_vec();
+            }
+            continue;
+        }
+        let newpath = join_bytes(&path, name);
+        let is_link = match std::fs::symlink_metadata(path_from_bytes(&newpath)) {
+            Ok(meta) => meta.file_type().is_symlink(),
+            Err(_) => false,
+        };
+        if !is_link {
+            path = newpath;
+            continue;
+        }
+        if let Some(cached) = seen.get(&newpath) {
+            match cached {
+                Some(resolved) => {
+                    path = resolved.clone();
+                    continue;
+                }
+                None => return Some((join_bytes(&newpath, rest), false)),
+            }
+        }
+        seen.insert(newpath.clone(), None);
+        let target = match std::fs::read_link(path_from_bytes(&newpath)) {
+            Ok(target) => crate::util::os_bytes(target.as_os_str()),
+            Err(_) => return None,
+        };
+        let (resolved, ok) = joinrealpath(path, target, seen, depth + 1)?;
+        if !ok {
+            return Some((join_bytes(&resolved, rest), false));
+        }
+        seen.insert(newpath, Some(resolved.clone()));
+        path = resolved;
+    }
+    Some((path, true))
+}
 
 fn resolve_units(units: &[u16]) -> Option<Vec<u16>> {
     let raw = crate::util::os_path_from_units(units);
@@ -678,35 +833,10 @@ fn resolve_units(units: &[u16]) -> Option<Vec<u16>> {
             .unwrap_or_else(|_| PathBuf::from("/"))
             .join(raw)
     };
-    let mut prefix = absolute.clone();
-    let mut tail: Vec<std::ffi::OsString> = Vec::new();
-    let resolved = loop {
-        match std::fs::canonicalize(&prefix) {
-            Ok(mut resolved) => {
-                for part in tail.iter().rev() {
-                    resolved.push(part);
-                }
-                break resolved;
-            }
-            Err(error) if error.raw_os_error() == Some(ELOOP) => {
-                return None;
-            }
-            Err(_) => {
-                let last = prefix.components().next_back();
-                match last {
-                    Some(component) => {
-                        tail.push(component.as_os_str().to_os_string());
-                        if !prefix.pop() {
-                            break prefix;
-                        }
-                    }
-                    None => break prefix,
-                }
-            }
-        }
-    };
-    let bytes = crate::util::os_bytes(resolved.as_os_str());
-    let units = fsdecode_units(&bytes);
+    let spelling = crate::util::os_bytes(absolute.as_os_str());
+    let mut seen = std::collections::HashMap::new();
+    let (resolved, _ok) = joinrealpath(Vec::new(), spelling, &mut seen, 0)?;
+    let units = fsdecode_units(&resolved);
     let scalars = scalars_of(&units);
     let mut parts: Vec<&[u32]> = Vec::new();
     for part in scalars.split(|scalar| *scalar == 0x2F) {
@@ -726,7 +856,15 @@ fn resolve_units(units: &[u16]) -> Option<Vec<u16>> {
         }
         out.extend_from_slice(part);
     }
-    Some(crate::util::text_from_scalars(&out).units().to_vec())
+    let finished = crate::util::text_from_scalars(&out).units().to_vec();
+    // The closing stat of resolve(): only the
+    // kernel's loop report fails the resolution.
+    if let Err(error) = std::fs::metadata(crate::util::os_path_from_units(&finished)) {
+        if error.raw_os_error() == Some(ELOOP) {
+            return None;
+        }
+    }
+    Some(finished)
 }
 
 /// Whether one resolved path stands strictly above
@@ -927,12 +1065,17 @@ fn run_score(parsed: &SubParsed) -> i32 {
         return path_error("no such tapes directory", &tapes_arg);
     }
     if let Some(out) = &output {
-        // The guard resolves all three paths; the
-        // interpreter's resolve raises on a symlink
-        // loop, uncaught, so an unresolvable path
-        // among them is the crash class (UH-17).
+        // The guard resolves all three paths, each
+        // by its pathlib string (the rules and tapes
+        // arguments arrive normalized, and the
+        // output is normalized here, as the
+        // interpreter's Path construction spells
+        // it); the interpreter's resolve raises on
+        // a symlink loop, uncaught, so an
+        // unresolvable path among them is the
+        // crash class (UH-17).
         let resolved = (
-            resolve_units(out.units()),
+            resolve_units(&normalize_path(out.units())),
             resolve_units(&rules_arg),
             resolve_units(&tapes_arg),
         );
