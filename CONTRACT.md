@@ -318,3 +318,23 @@ in the round dossier.
   CodeRabbit's advisory pass on Round 3's PR 4
   posted no findings (zero entries on the review
   endpoints), so no disposition is owed from it.
+- UH-25a. Amendment, from the Round 4 reviews.
+  The walk this oracle performs is recursive in
+  the interpreter, one frame per nested splice,
+  under the default recursion limit, and at the
+  shipped CLI that budget is measured: 990
+  nested splices resolve, the 991st raises
+  RecursionError out of resolve() (the crash
+  class). The bound is on nesting depth, not
+  splice count. The port's walk carries the
+  same budget: a resolution whose nesting
+  passes the measured bound fails, and the
+  guard reads the failure as it reads a loop.
+  The number is the shipped CLI's, recorded as
+  measured; a differently invoked interpreter
+  could shift it. This amendment also corrects
+  UH-25 in two places: the crash class is
+  UH-17's, not UH-21's, and the repair the
+  round landed is a transcription of the
+  interpreter's walk under this budget, not
+  the sibling composite UH-25 sketched.
