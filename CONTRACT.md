@@ -338,3 +338,33 @@ in the round dossier.
   round landed is a transcription of the
   interpreter's walk under this budget, not
   the sibling composite UH-25 sketched.
+- UH-28. Round 5 repairs the deleted-working-
+  directory shape at the output guard, filed by
+  secondbill's Round 4 red team and carried in
+  this line's owed file: from a deleted working
+  directory, a relative output spelling makes
+  the interpreter's resolve raise uncaught (the
+  crash class this crate already carries for
+  loops), while the port's resolver falls back
+  to a manufactured prefix and can compare a
+  fiction. The repair: a failed current_dir
+  read fails the resolution for relative
+  spellings (the crash class follows); absolute
+  spellings never consult the working directory.
+  SB-25a in the sibling is the shape of the fix,
+  but this crate's call order is its own: the
+  guard's rules is_file and tapes is_dir checks
+  precede resolution, and the probe pass fixes
+  which of them already crash or refuse from a
+  deleted cwd before the repair is written.
+- UH-29. The differential harness gains a
+  deleted-cwd launch mode and the cells (a
+  relative output spelling onto the rules or
+  tapes, a relative spelling away, an absolute
+  spelling away, an absolute spelling onto),
+  with the control run against the pre-repair
+  binary failing exactly the new cells. The
+  standing harness stays clean.
+- UH-30. README records 5 of 100 only in the
+  closure commit written after this round's
+  three reviews, fixes, and owner verification.
