@@ -672,17 +672,32 @@ fn normalize_path(units: &[u16]) -> Vec<u16> {
 /// resolution is still open is a loop: the walk
 /// leaves that component and the rest of the
 /// spelling standing in the result unresolved.
-/// The walk itself raises nothing. The raise the
-/// output guard reads as the interpreter's crash
-/// (UH-17, UH-24) is the closing stat of
-/// resolve(): the finished path is stat'ed whole,
-/// and the ELOOP the kernel reports there fails
-/// the resolution outright. No other stat failure
-/// fails it, and no count of splices bounds the
-/// walk.
+/// The walk itself raises nothing. Two failures
+/// end a resolution, both read by the output
+/// guard as the interpreter's crash (UH-17,
+/// UH-24). One is depth: the interpreter runs the
+/// walk recursively, one frame per nested
+/// splice, and a call nested past the budget
+/// below raises RecursionError out of resolve(),
+/// so the walk fails there too. The other is the
+/// closing stat of resolve(): the finished path
+/// is stat'ed whole, and the ELOOP the kernel
+/// reports there fails the resolution outright.
+/// No other stat failure fails it.
 /// The kernel's symlink-loop errno on this
 /// platform family.
 const ELOOP: i32 = 40;
+
+/// The walk's recursion budget (UH-25a): at the
+/// shipped CLI the interpreter's default
+/// recursion limit leaves room for 990 nested
+/// splices, and the 991st raises RecursionError.
+/// The count is of nesting depth, not of splices
+/// in total: the top call of a resolution stands
+/// at depth 0 and each splice's call stands one
+/// deeper, so a spelling carrying two sequential
+/// chains nests only as deep as the deeper one.
+const MAX_WALK_DEPTH: usize = 990;
 
 /// os.path.join on byte strings: an absolute
 /// second part stands alone, an empty or
@@ -730,16 +745,26 @@ fn path_from_bytes(bytes: &[u8]) -> PathBuf {
 /// spelling still to walk, and `seen` the links
 /// already met, an open entry (None) marking a
 /// resolution still in progress and a finished
-/// one carrying its result. Returns the resolved
-/// prefix and whether the walk completed; a link
-/// whose target bytes cannot be read aborts the
-/// walk the way the interpreter's uncaught raise
-/// aborts the resolution, read here as None.
+/// one carrying its result. `depth` is the
+/// nesting of this call, the top call of a
+/// resolution standing at 0; a call entered past
+/// MAX_WALK_DEPTH aborts the walk, read here as
+/// None, the way the interpreter's RecursionError
+/// aborts the resolution (UH-25a). Returns the
+/// resolved prefix and whether the walk
+/// completed; a link whose target bytes cannot
+/// be read aborts the walk the way the
+/// interpreter's uncaught raise does, likewise
+/// read as None.
 fn joinrealpath(
     mut path: Vec<u8>,
     rest: Vec<u8>,
     seen: &mut std::collections::HashMap<Vec<u8>, Option<Vec<u8>>>,
+    depth: usize,
 ) -> Option<(Vec<u8>, bool)> {
+    if depth > MAX_WALK_DEPTH {
+        return None;
+    }
     let mut rest: &[u8] = &rest;
     if rest.first() == Some(&0x2F) {
         rest = &rest[1..];
@@ -789,7 +814,7 @@ fn joinrealpath(
             Ok(target) => crate::util::os_bytes(target.as_os_str()),
             Err(_) => return None,
         };
-        let (resolved, ok) = joinrealpath(path, target, seen)?;
+        let (resolved, ok) = joinrealpath(path, target, seen, depth + 1)?;
         if !ok {
             return Some((join_bytes(&resolved, rest), false));
         }
@@ -810,7 +835,7 @@ fn resolve_units(units: &[u16]) -> Option<Vec<u16>> {
     };
     let spelling = crate::util::os_bytes(absolute.as_os_str());
     let mut seen = std::collections::HashMap::new();
-    let (resolved, _ok) = joinrealpath(Vec::new(), spelling, &mut seen)?;
+    let (resolved, _ok) = joinrealpath(Vec::new(), spelling, &mut seen, 0)?;
     let units = fsdecode_units(&resolved);
     let scalars = scalars_of(&units);
     let mut parts: Vec<&[u32]> = Vec::new();
