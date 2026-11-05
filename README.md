@@ -20,7 +20,7 @@ shape. Setup landed earlier in October 2026.
 
 ## Programme status
 
-- Closed perfection rounds, 5 of 100. A round counts only when a
+- Closed perfection rounds, 6 of 100. A round counts only when a
   full cycle of work, audit, review, red team, and approval has
   closed.
 - Contract, UH-1 to UH-12 as amended, met for the Round 1 scope.
