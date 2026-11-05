@@ -514,3 +514,22 @@ in the round dossier.
   composed cells fail under either family's
   control accounting, never counted twice in
   one family's total.
+- UH-39. Correction to UH-38's composed-cell
+  sentence, on the spec review's measurement.
+  The combined control against the pre-repair
+  binary fails exactly thirteen steps (the
+  six tailed and the seven popped) and the
+  composed cells pass it, invisible there
+  because each defect masks the other. The
+  composed cells fail under exactly one
+  half-repair control: with the tail repaired
+  and the temp live they diverge (nine
+  failures: the seven popped and the two
+  composed); with the temp repaired and the
+  tail live they pass (six failures: the six
+  tailed). The temp defect is the composed
+  cells' sole producing cause, so they are
+  carried in the temp family's accounting,
+  and UH-38's "fail under either family's
+  control accounting" is superseded by this
+  sentence wherever the two disagree.
