@@ -368,3 +368,55 @@ in the round dossier.
 - UH-30. README records 5 of 100 only in the
   closure commit written after this round's
   three reviews, fixes, and owner verification.
+- UH-31. Round 6 probes two write-seam
+  families at this crate's single command,
+  both filed before this round opened.
+  First, the tailed output spelling (filed at
+  Round 5): whether the write consumes the
+  raw argv spelling or the pathlib
+  constructed spelling (empty and dot
+  components dropped wherever they stand, a
+  leading separator pair standing as the
+  anchor), measured over the trailing
+  separator and dot forms, an overwrite under
+  a tail, a missing name under a tail, a
+  directory under a tail, the collapsed
+  spellings, and the boundary pins, against
+  the oracle. Second, the temp placement law
+  (measured in secondbill's Round 5 and the
+  Round 6 rounds of retroforge, wallofwrong,
+  and bluepencil): the oracle's write creates
+  its temp through tempfile.mkstemp, which
+  absolutizes the parent lexically (cwd join,
+  then normpath, no link resolution), so the
+  popped-link family is probed here too (an
+  output whose parent contains a symlink
+  component that a following dotdot pops,
+  across the existence boundary, in plain,
+  tailed, absolute, deep, and escape-link
+  spellings). This crate's guard resolves the
+  output's normalized spelling and the oracle
+  crashes uncaught on a guard loop (the UH-25
+  posture), so the probes record for each
+  shape whether the guard is reached and
+  what it does, as the sibling rounds did.
+  Each family is measured against the oracle
+  before any repair is written; repairs
+  follow the measurements under new clauses,
+  each family with its own control run
+  against the pre-repair binary; the harness
+  gains the proven cells with boundary pins
+  ordered before convicted cells where a
+  one-sided write could echo through later
+  snapshots.
+- UH-32. The CodeRabbit disposition owed from
+  Round 5 discharges here on evidence: the
+  Round 5 pull request carries zero inline
+  findings on read-back (checked 2026-11-04 in
+  the rotation-wide late sweep), so there is
+  nothing to fix and the absence is the
+  disposition.
+- UH-33. README records 6 of 100 only in the
+  closure commit written after this round's
+  three reviews, fixes, and owner
+  verification.
