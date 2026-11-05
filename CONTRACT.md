@@ -420,3 +420,97 @@ in the round dossier.
   closure commit written after this round's
   three reviews, fixes, and owner
   verification.
+- UH-34. The tailed-spelling family, measured
+  under UH-31 (probe table in the round's
+  lane record): the write consumes the
+  pathlib constructed spelling, never the raw
+  argv spelling. The oracle builds Path(output)
+  once and hands the constructed path to the
+  guard and the write alike, so the temp's
+  parent, the temp's prefix name, and the
+  replace target all follow the construction
+  (empty and dot components dropped wherever
+  they stand, dotdot standing whole, a leading
+  separator pair standing as the anchor). The
+  port's emit handed the raw spelling to its
+  write, whose rename the kernel refuses on a
+  trailing separator or a trailing dot
+  component: fresh and overwrite spellings
+  under a slash, dot, and double-slash tail
+  (six shapes) are refused cannot-write by
+  the port where the oracle writes. The
+  repair hands the constructed path to the
+  write; the guard and the cannot-write
+  message already consume the construction
+  and do not move.
+- UH-35. The harness gains the tailed cells of
+  UH-34: the trailing separator and dot forms
+  fresh and over an existing output, the
+  double-slash tail, the missing name and the
+  directory under a tail, the collapsed
+  spellings, and the boundary pins (a trailing
+  dotdot through a real and a missing
+  directory, a dotdot followed by a name,
+  three dots as a name, and the guard shapes
+  under tails), with the control run against
+  the pre-repair binary failing exactly the
+  six convicted cells.
+- UH-36. The temp placement law, measured
+  under UH-31: the write's temp is created
+  under the lexically absolutized parent of
+  the constructed path. The oracle's
+  _write_atomically hands tempfile.mkstemp
+  the constructed parent as a string, and
+  mkstemp absolutizes it lexically (cwd join,
+  then posixpath.normpath, no link
+  resolution) before creating the temp; the
+  port created its temp under the spelled
+  parent, so the kernel resolved a symlink
+  component physically before a following
+  dotdot popped it. The convicted family is
+  the popped-link shapes where only the
+  physically resolved parent exists (plain,
+  overwrite, absolute, deep, escape-link,
+  two links in sequence, and a dotdot
+  carrying target): the port writes at exit 0
+  where the oracle refuses cannot-write. The
+  repair creates the temp under the lexical
+  parent so computed; the rename target
+  remains the constructed path itself.
+- UH-37. The boundary agreements of the temp
+  law: where the lexical parent exists and
+  the physical does not, both sides refuse
+  (the oracle at its replace, the port at
+  its temp creation); where both exist, both
+  write at the physical target; where neither
+  exists, both refuse; a real-directory pop
+  leaves the parents coincident and agrees
+  either way; a lexical parent standing as a
+  plain file refuses on both sides. A failed
+  cwd read under a relative parent fails the
+  write step on the oracle's terms (mkstemp's
+  own raise reaching its cannot-write catch);
+  that arm is unreachable behind the guard,
+  whose resolve dies on the same failed read
+  first (UH-28), and stands for totality; an
+  absolute parent never consults the cwd.
+  The tailed only-physical shapes refuse on
+  both sides before and after either single
+  repair, because the tail defect and the
+  temp defect each refuse alone; they are
+  carried as composed cells under UH-38.
+- UH-38. The harness gains the popped-link
+  cells of UH-36: the convicted shapes and
+  the boundary pins of UH-37 ordered before
+  them, the guard cells (pops onto the rules
+  file and into the tapes directory refused
+  at the guard, a cancelled loop passing the
+  guard, a standing loop in the guard's crash
+  class), and the composed tail-under-pop
+  cells, with control runs against the
+  pre-repair binary separated per family:
+  the temp family's control fails exactly
+  its seven convicted cells, and the
+  composed cells fail under either family's
+  control accounting, never counted twice in
+  one family's total.
