@@ -889,28 +889,94 @@ fn is_ancestor(ancestor: &[u16], path: &[u16]) -> bool {
 
 static TEMP_COUNTER: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
 
-/// The mkstemp-shaped write: a sibling temp with
-/// the target's name and a dot for a prefix, no
-/// suffix, mode 0600, replaced onto the target,
+/// posixpath.normpath over an absolute spelling
+/// (UH-36): exactly two leading separators stand
+/// as the anchor and any other leading run reads
+/// as one; empty and dot components drop, and a
+/// dot-dot pops the component before it, a pop
+/// at the root dropping. No link is read: the
+/// normalization is lexical, the way mkstemp's
+/// abspath reads its directory.
+fn normpath_bytes(path: &[u8]) -> Vec<u8> {
+    let leading = path.iter().take_while(|byte| **byte == 0x2F).count();
+    let anchor: &[u8] = if leading == 2 { b"//" } else { b"/" };
+    let mut kept: Vec<&[u8]> = Vec::new();
+    for part in path.split(|byte| *byte == 0x2F) {
+        if part.is_empty() || part == b"." {
+            continue;
+        }
+        if part == b".." {
+            kept.pop();
+            continue;
+        }
+        kept.push(part);
+    }
+    let mut out = anchor.to_vec();
+    for (index, part) in kept.iter().enumerate() {
+        if index > 0 {
+            out.push(0x2F);
+        }
+        out.extend_from_slice(part);
+    }
+    out
+}
+
+/// The lexical absolutization mkstemp performs
+/// on its directory (UH-36, UH-37): an absolute
+/// parent is normalized as it stands and never
+/// consults the working directory; a relative
+/// parent is joined to the working directory
+/// first, and a working directory that cannot
+/// be read fails the step, the way mkstemp's
+/// own raise fails the oracle's write.
+fn lexical_abspath(parent: &[u8]) -> Option<Vec<u8>> {
+    let joined = if parent.first() == Some(&0x2F) {
+        parent.to_vec()
+    } else {
+        let cwd = std::env::current_dir().ok()?;
+        join_bytes(&crate::util::os_bytes(cwd.as_os_str()), parent)
+    };
+    Some(normpath_bytes(&joined))
+}
+
+/// The mkstemp-shaped write (UH-34, UH-36): the
+/// path is the constructed output spelling, and
+/// it splits the way pathlib splits it, the
+/// parent of a bare name reading as the dot and
+/// the collapsed dot path carrying no name. The
+/// temp is a sibling under the parent's lexical
+/// absolutization, named with the target's name
+/// and a dot for a prefix, no suffix, mode 0600,
+/// replaced onto the constructed path itself,
 /// and unlinked on any failure.
 fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), ()> {
-    let dir = match path.parent() {
-        Some(parent) if !parent.as_os_str().is_empty() => parent.to_path_buf(),
-        _ => PathBuf::from("."),
+    let spelling = crate::util::os_bytes(path.as_os_str());
+    let (head, tail) = split_bytes(&spelling);
+    let (parent, name): (Vec<u8>, Vec<u8>) = if spelling == b"." {
+        (b".".to_vec(), Vec::new())
+    } else if head.is_empty() {
+        (b".".to_vec(), tail)
+    } else {
+        (head, tail)
     };
-    let name = path
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_default();
+    let dir = match lexical_abspath(&parent) {
+        Some(dir) => dir,
+        None => return Err(()),
+    };
     let mut attempt = 0u32;
     let tmp = loop {
-        let candidate = dir.join(format!(
-            "{}.{}{}{}",
-            name,
-            std::process::id(),
-            TEMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst),
-            attempt
-        ));
+        let mut candidate_name = name.clone();
+        candidate_name.push(0x2E);
+        candidate_name.extend_from_slice(
+            format!(
+                "{}{}{}",
+                std::process::id(),
+                TEMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst),
+                attempt
+            )
+            .as_bytes(),
+        );
+        let candidate = path_from_bytes(&join_bytes(&dir, &candidate_name));
         #[cfg(unix)]
         let opener = {
             use std::os::unix::fs::OpenOptionsExt;
@@ -953,9 +1019,12 @@ fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), ()> {
 /// The Python's write at the end of _score: write
 /// the rendered bytes to stdout or atomically to
 /// the output, and on a failure name it with the
-/// output as a path.
+/// output as a path. The write consumes the
+/// output's constructed spelling (UH-34), as
+/// the interpreter's one Path construction hands
+/// the same path to the guard and the write.
 fn emit(bytes_result: Result<Vec<u8>, crate::emit::EmitError>, out: Option<&Text>) -> i32 {
-    let out_path = out.map(|text| crate::util::os_path_from_units(text.units()));
+    let out_path = out.map(|text| crate::util::os_path_from_units(&normalize_path(text.units())));
     let bytes = match bytes_result {
         Ok(bytes) => bytes,
         Err(_) => {
