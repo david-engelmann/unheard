@@ -533,3 +533,107 @@ in the round dossier.
   and UH-38's "fail under either family's
   control accounting" is superseded by this
   sentence wherever the two disagree.
+- UH-40. This round's subject is the temp
+  suffix's width, the one arm of the write
+  seam left unmeasured at Round 6 and filed
+  there for this round. UH-34 to UH-39
+  settled the write's spelling, the temp's
+  placement, and the two families'
+  composition; the candidate's name was
+  measured as the target's raw name and a
+  dot. What the candidate carries after the
+  dot is this round's whole question.
+- UH-41. The CodeRabbit disposition owed
+  from Round 6 discharges here on evidence:
+  PR 7 carries zero inline findings on
+  read-back (checked 2026-11-06: zero review
+  comments and zero reviews; its summary
+  shell finalized after the merge recording
+  that the review failed because the pull
+  request is closed, with a findings-free
+  walkthrough, and a second bot comment
+  recording the follow-up action not
+  completed for the same reason), so there
+  is nothing to fix and nothing to dismiss,
+  and the absence is the disposition.
+- UH-42. The suffix law, measured: where
+  mkstemp appends exactly eight characters,
+  so the Python's candidate is the name plus
+  nine and it writes basenames through 246
+  bytes and refuses at 247 at every pid, the
+  port's generator concatenates the decimal
+  digits of the process id, a per-process
+  counter, and the attempt, so its suffix
+  runs from three characters upward with
+  the pid's width and its boundary moves
+  with it. Measured in three postures
+  against the Python: at pid 1 the suffix is
+  three and the port writes through 251,
+  refusing at 252; at pid 203 the suffix is
+  five and it writes through 249, refusing
+  at 250; at a six-digit ambient pid the
+  suffix is eight by coincidence and the
+  boundary stands at the Python's own 246
+  and 247. The Round 6 red team's filed
+  measurement completes the law's other
+  direction: at a seven-digit pid the suffix
+  is nine and the port refuses the 246-byte
+  name the Python writes. The observable
+  law is the suffix's length; its characters
+  are not behavior on either side.
+- UH-43. The repair: the suffix is exactly
+  eight hexadecimal characters, drawn from
+  the first four bytes of a SHA-256 hash of
+  the process id, the counter, and the
+  attempt, each as little-endian bytes. The
+  shape is the family's settled one (ST-37,
+  VL-42, FT-74: eight hex characters from
+  four drawn bytes) fitted to this crate:
+  sha2 is already its only dependency and
+  its digest module's standing tool, and the
+  three hashed terms are the crate's whole
+  existing entropy, there being no
+  wall-clock read anywhere in it. The
+  counter increments on every draw and the
+  attempt on every collision, so no two
+  candidates in a process share a draw, and
+  the create-new redraw loop, the 0600 mode,
+  the temp's placement, the rename onto the
+  constructed path, and the unlink on
+  failure all stand as UH-34 to UH-36 left
+  them.
+- UH-44. The byte-counting arm, measured
+  absent: the candidate's name is the
+  target's raw name bytes end to end, from
+  the spelled output's OS bytes through the
+  byte split, the lexical absolutization,
+  and the byte join, and the one lossy
+  conversion in the tree is the non-unix
+  fallback inside the byte reader, off the
+  measured platform. Twin cells carrying
+  one raw byte at the boundary lengths
+  diverge before the repair only where
+  UH-42's width puts them (at pid 1, the
+  247- and 251-byte raw names the Python
+  refuses), and the raw byte lands intact
+  on both sides; after the repair every
+  raw cell agrees.
+- UH-45. The differential harness gains the
+  boundary cells in both pid postures: the
+  plain lengths around every measured flip
+  (245 to 252), the popped-parent lengths,
+  and the raw-byte lengths, each run at the
+  ambient pid and at pid 1 in a fresh
+  namespace. The control runs are part of
+  the evidence: against the pre-repair
+  binary the new cells fail exactly where
+  UH-42's law puts them and no others, and
+  two scratch mutants of the repaired
+  generator, one widening the suffix to
+  eighteen and one narrowing it to four,
+  each fail the new cells in their own
+  direction.
+- UH-46. README records 7 of 100 only in
+  the closure commit written after this
+  round's three reviews, fixes, and owner
+  verification.
