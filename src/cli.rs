@@ -11,6 +11,7 @@
 //! operating system's own decoding (fsdecode), so
 //! argument bytes survive as the Python's do.
 
+use sha2::{Digest, Sha256};
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -939,6 +940,31 @@ fn lexical_abspath(parent: &[u8]) -> Option<Vec<u8>> {
     Some(normpath_bytes(&joined))
 }
 
+/// The temp candidate's suffix (UH-43):
+/// exactly eight hexadecimal characters, the
+/// first four bytes of a SHA-256 hash of the
+/// process id, the draw counter, and the
+/// attempt, each as little-endian bytes. The
+/// counter increments on every draw and the
+/// attempt on every collision, so no two
+/// candidates in a process share a draw; the
+/// length is the law UH-42 measured, eight
+/// being mkstemp's own suffix width.
+fn temp_suffix(counter: u32, attempt: u32) -> [u8; 8] {
+    let mut hasher = Sha256::new();
+    hasher.update(std::process::id().to_le_bytes());
+    hasher.update(counter.to_le_bytes());
+    hasher.update(attempt.to_le_bytes());
+    let digest = hasher.finalize();
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut out = [0u8; 8];
+    for i in 0..4 {
+        out[2 * i] = HEX[(digest[i] >> 4) as usize];
+        out[2 * i + 1] = HEX[(digest[i] & 0xF) as usize];
+    }
+    out
+}
+
 /// The mkstemp-shaped write (UH-34, UH-36): the
 /// path is the constructed output spelling, and
 /// it splits the way pathlib splits it, the
@@ -946,7 +972,8 @@ fn lexical_abspath(parent: &[u8]) -> Option<Vec<u8>> {
 /// the collapsed dot path carrying no name. The
 /// temp is a sibling under the parent's lexical
 /// absolutization, named with the target's name
-/// and a dot for a prefix, no suffix, mode 0600,
+/// and a dot for a prefix, its suffix the eight
+/// hexadecimal characters of UH-43, mode 0600,
 /// replaced onto the constructed path itself,
 /// and unlinked on any failure.
 fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), ()> {
@@ -967,15 +994,10 @@ fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), ()> {
     let tmp = loop {
         let mut candidate_name = name.clone();
         candidate_name.push(0x2E);
-        candidate_name.extend_from_slice(
-            format!(
-                "{}{}{}",
-                std::process::id(),
-                TEMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst),
-                attempt
-            )
-            .as_bytes(),
-        );
+        candidate_name.extend_from_slice(&temp_suffix(
+            TEMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst),
+            attempt,
+        ));
         let candidate = path_from_bytes(&join_bytes(&dir, &candidate_name));
         #[cfg(unix)]
         let opener = {
