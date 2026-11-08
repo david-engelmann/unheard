@@ -637,3 +637,275 @@ in the round dossier.
   the closure commit written after this
   round's three reviews, fixes, and owner
   verification.
+- UH-47. This round's subject is the temp
+  suffix's draw itself, the question Round
+  7's reviews filed and this round
+  answers. UH-42 to UH-45 settled the
+  suffix's width, its boundary, and its
+  byte counting; what the suffix is drawn
+  from stood verbatim in the shipped
+  source, the first four bytes of a
+  SHA-256 hash of the process id, the draw
+  counter, and the attempt, and the red
+  team's filed cell (P3) showed the draw
+  is a public function of the process id.
+  Whether that exposure is real against
+  the shipped binary, in which postures it
+  bites, and what closing it changes are
+  this round's whole question.
+- UH-48. The CodeRabbit dispositions owed
+  from Round 7 discharge here on evidence.
+  PR 8 carries zero findings on full
+  read-back (checked 2026-11-07: zero
+  review comments and zero reviews; its
+  summary shell, comment 6687754194,
+  posted 2026-11-06T14:54:25Z, seven
+  minutes before the 15:01:24Z merge, is a
+  completed walkthrough stating that no
+  actionable comments were generated, and
+  the only later comment is the owner's
+  landing note), so Round 7's merge-time
+  record of zero findings stands confirmed
+  whole. PR 9, the merge-queue shaping,
+  likewise carries zero findings on
+  read-back (zero review comments, zero
+  reviews, one summary shell,
+  6700625565, posted before its merge,
+  stating the same). There is nothing to
+  fix and nothing to dismiss, and the
+  absence is the disposition.
+- UH-49. The draw's exposure, measured.
+  One output write in a fresh process
+  draws exactly 65 candidates, the pairs
+  (counter, attempt) = (i, i) for i in
+  0..=64, the counter starting at 0 and
+  both advancing once per collision until
+  the attempt passes 64 and the write
+  refuses. Every term is public, so the
+  65 names of a run are computable from
+  its process id alone, and planting them
+  in the output's directory makes the
+  shipped binary refuse the write with
+  the cannot-write line while the Python
+  writes. Measured at pid 1 in a fresh
+  namespace, at pid 250 in a fresh
+  namespace, and at an ambient pid by a
+  launcher that plants for its own pid
+  before it execs: the refusal lands in
+  all three postures. Bounded planting is
+  absorbed by the redraw (one, three, and
+  64 of the 65 names planted at pid 1, and
+  64 at pid 250, the write lands on the
+  first unplanted draw). The Python cannot
+  be planted against in this shape:
+  mkstemp draws eight characters from a
+  37-character alphabet, about 3.5
+  trillion candidates, from a per-process
+  random sequence the operating system's
+  entropy seeds, and no feasible plant
+  set stands in its way. Correctness is
+  never at stake on either side: the
+  create-new draw means a plant is never
+  opened, so the exposure is refusal
+  only, and it needs write access to the
+  output directory plus the victim's pid,
+  a position that already allows more
+  direct refusal. It is convicted anyway,
+  because the port made a public draw of
+  what the Python keeps unguessable, and
+  UH-43's repair is what published it.
+- UH-50. The repair: the suffix is still
+  exactly eight hexadecimal characters
+  from the first four bytes of a SHA-256
+  hash, and the hash now takes four
+  terms, the process id, the wall-clock
+  nanoseconds since the epoch, the draw
+  counter, and the attempt, each as
+  little-endian bytes. The clock read is
+  the crate's first: UH-43 recorded that
+  the three hashed terms were the crate's
+  whole existing entropy, there being no
+  wall-clock read anywhere in it, and
+  that sentence is superseded by this
+  item wherever the two disagree. The
+  counter still increments on every draw
+  and the attempt on every collision, so
+  no two candidates in a process share a
+  draw, and the create-new redraw loop,
+  the 0600 mode, the temp's placement,
+  the rename onto the constructed path,
+  and the unlink on failure all stand as
+  UH-34 to UH-36 left them. A clock that
+  reads before the epoch fails the draw,
+  and the write refuses with the same
+  cannot-write line and exit 1 as any
+  other write failure, leaving nothing
+  behind; UH-51 measures that arm. The
+  sibling shape is the family's settled
+  one (tetlock's and bluepencil's draws
+  carry the clock in the mix, and
+  bluepencil's BP-47a contracts the same
+  refusal), fitted to this crate: pid,
+  nanoseconds, counter, attempt.
+- UH-51. The clock arm, measured with an
+  LD_PRELOAD shim on clock_gettime. With
+  the clock reading one second before the
+  epoch, the Python writes its document
+  unchanged (mkstemp never reads the clock
+  for its names), the pre-repair port
+  writes too (it reads no clock anywhere),
+  and the repaired port refuses: exit 1,
+  the cannot-write line naming the output,
+  nothing landed, and no temp left
+  behind. With the clock call itself
+  failing (the shim returns EINVAL), the
+  Python and the pre-repair port again
+  write, and the repaired port dies inside
+  the standard library's clock read, its
+  panic on stderr, exit 1, nothing landed,
+  and the tree left exactly as seeded. The
+  contracted guarantee is the pair: no
+  write under either broken-clock shape;
+  the clean refusal is contracted for the
+  pre-epoch shape, and the erroring
+  shape's panic is recorded as measured,
+  not smoothed over.
+- UH-52. The byte-counting arm, for the
+  draw: the plant set is name-independent.
+  No name or path byte enters the hash
+  (the draw's inputs are the process id,
+  the clock, the counter, and the
+  attempt, all integers), and the
+  candidate's name is the target's raw
+  name bytes end to end, as UH-44
+  measured for the width question. The
+  twin cell carrying one raw byte in the
+  output's name plants the same 65
+  suffixes as the plain cell, and it
+  convicts and clears with the plain
+  cell. There is no lossy seam in the
+  suffix path to measure: the tree's one
+  lossy conversion stands where UH-44
+  left it, the non-unix fallback inside
+  the byte reader, off the measured
+  platform and off this path.
+- UH-53. The differential harness gains
+  two cases, 13 cases and 130 steps in
+  all. The planted-names case runs the
+  plant sets of UH-49 as twin cells: at
+  pid 1 and at pid 250 in fresh namespaces
+  and at an ambient pid by a self-planting
+  launcher, the bounded sets standing as
+  genuine-acceptance cells (the write
+  lands through the collisions) and the
+  full 65 standing as the convicted cell.
+  The clock case runs both sides under
+  the shim of UH-51 and asserts the two
+  contracted splits, the Python writing
+  and the port refusing under the
+  pre-epoch clock with nothing left
+  behind, and the port dying in the clock
+  read under the erroring clock with the
+  tree left as seeded. The control runs
+  are part of the evidence: against the
+  pre-repair binary the harness fails on
+  exactly seven steps, the five full-plant
+  cells and the clock case's two splits,
+  and no others, and against the repaired
+  binary it runs clean, 130 steps and no
+  failures.
+- UH-54. Item 3 stands open, stated
+  exactly. The one-line description is
+  identical in two of its three homes:
+  the repository description and the
+  README's lede are byte-identical, set
+  so by this round, and Cargo.toml
+  carries no description field at all.
+  The line itself also promises the
+  proposing of rewording, relocation, or
+  deletion, which the boundary sentence
+  assigns to bluepencil: unheard measures
+  the hearing and never edits. The lede
+  stands verbatim because the standard
+  pins it to the repository description,
+  and the opening paragraph states the
+  boundary, so the first screen read
+  whole does not hide the gap. Writing
+  the field, and settling the line, is a
+  separate pass on David's word, and
+  this item is its record.
+- UH-55. README records 8 of 100 only in
+  the closure commit written after this
+  round's three reviews, fixes, and
+  owner verification.
+- UH-56. CodeRabbit's review of this
+  round's pull request (PR 10, review
+  5816559322, four actionable comments
+  carried in three comment bodies) is
+  disposed of here. Three findings are
+  repaired in the README, each verified
+  against the source and demonstrated
+  against the shipped binary before
+  its sentence was written. The rules
+  file's structure is now stated where
+  the rules file is introduced: a list
+  item before any heading fails with
+  "error, rule outside any section at
+  line 1" (demonstrated), a marker
+  with no text after it fails with
+  "error, empty rule at line 3"
+  (demonstrated), and a file of prose
+  alone scores no rules at all, its
+  document empty in every list
+  (demonstrated); numbered and starred
+  markers inventory like dashed ones
+  (demonstrated), and a prose line
+  underlined as a setext heading
+  serves as the heading (demonstrated).
+  The path prohibition's reach is now
+  stated where the shapes are named:
+  against a synthetic tape whose Read
+  call and Bash call carry
+  secrets/prod.env in their input
+  strings and whose Edit call names
+  another path, the rule "Do not edit
+  secrets/prod.env" recorded two
+  ignored observations and two
+  violations, one per carrying call,
+  so a call that only reads the path
+  counts as a violation (demonstrated,
+  and read in src/scoring.rs, where
+  the shape tests every string in a
+  call's input and never the tool).
+  The six shapes' accepted wordings
+  are now listed in the README in
+  place of the concept names alone:
+  all 28 literal forms the matcher
+  accepts (read in src/shapes.rs)
+  were scored in one battery and
+  every one measured with its
+  expected shape, and "Do not ever
+  use Grep" scored unmeasured in the
+  same battery, the near wording the
+  review named (demonstrated). One
+  finding is dismissed with its
+  reason: the Install block's PATH
+  note (comment 4504978392) asks for
+  prose about persisting the path,
+  and the block is the fleet's
+  uniform self-contained verification
+  install, a scratch CARGO_HOME
+  inside the clone with its bin on
+  PATH for the session, verified
+  verbatim in that form by this
+  round's reviews, with the
+  Quickstart running in the same
+  shell by design; the same shape
+  was dismissed on the same basis at
+  flighttape (FT-87). This item lands
+  after the closure commit by the
+  round's server-side sequence, and
+  the rounds line the closure set
+  (8 of 100) is untouched and still
+  exact.
+

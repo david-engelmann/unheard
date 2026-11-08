@@ -940,19 +940,32 @@ fn lexical_abspath(parent: &[u8]) -> Option<Vec<u8>> {
     Some(normpath_bytes(&joined))
 }
 
-/// The temp candidate's suffix (UH-43):
-/// exactly eight hexadecimal characters, the
-/// first four bytes of a SHA-256 hash of the
-/// process id, the draw counter, and the
-/// attempt, each as little-endian bytes. The
-/// counter increments on every draw and the
-/// attempt on every collision, so no two
-/// candidates in a process share a draw; the
-/// length is the law UH-42 measured, eight
-/// being mkstemp's own suffix width.
-fn temp_suffix(counter: u32, attempt: u32) -> [u8; 8] {
+/// The temp candidate's suffix (UH-43,
+/// amended by UH-50): exactly eight
+/// hexadecimal characters, the first four
+/// bytes of a SHA-256 hash of the process
+/// id, the wall-clock nanoseconds since
+/// the epoch, the draw counter, and the
+/// attempt, each as little-endian bytes.
+/// The counter increments on every draw
+/// and the attempt on every collision, so
+/// no two candidates in a process share a
+/// draw; the length is the law UH-42
+/// measured, eight being mkstemp's own
+/// suffix width. The clock term is what
+/// keeps the draw from being a public
+/// function of the process id (UH-49); a
+/// clock that reads before the epoch
+/// fails the draw, and the write refuses
+/// with it (UH-51).
+fn temp_suffix(counter: u32, attempt: u32) -> Option<[u8; 8]> {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .ok()?
+        .as_nanos();
     let mut hasher = Sha256::new();
     hasher.update(std::process::id().to_le_bytes());
+    hasher.update(nanos.to_le_bytes());
     hasher.update(counter.to_le_bytes());
     hasher.update(attempt.to_le_bytes());
     let digest = hasher.finalize();
@@ -962,7 +975,7 @@ fn temp_suffix(counter: u32, attempt: u32) -> [u8; 8] {
         out[2 * i] = HEX[(digest[i] >> 4) as usize];
         out[2 * i + 1] = HEX[(digest[i] & 0xF) as usize];
     }
-    out
+    Some(out)
 }
 
 /// The mkstemp-shaped write (UH-34, UH-36): the
@@ -994,10 +1007,12 @@ fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), ()> {
     let tmp = loop {
         let mut candidate_name = name.clone();
         candidate_name.push(0x2E);
-        candidate_name.extend_from_slice(&temp_suffix(
-            TEMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst),
-            attempt,
-        ));
+        let counter = TEMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        let suffix = match temp_suffix(counter, attempt) {
+            Some(suffix) => suffix,
+            None => return Err(()),
+        };
+        candidate_name.extend_from_slice(&suffix);
         let candidate = path_from_bytes(&join_bytes(&dir, &candidate_name));
         #[cfg(unix)]
         let opener = {
@@ -1256,5 +1271,68 @@ pub fn run_cli() -> i32 {
     match parse_top(&tokens) {
         ParseOutcome::Run(parsed) => run_score(&parsed),
         ParseOutcome::Exit(code) => code,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::temp_suffix;
+    use sha2::{Digest, Sha256};
+
+    /// The Round 7 draw, the public function of
+    /// the pid that UH-49 convicted: the first
+    /// four bytes of a SHA-256 hash of the
+    /// process id, the counter, and the attempt.
+    fn public_draw(counter: u32, attempt: u32) -> [u8; 8] {
+        let mut hasher = Sha256::new();
+        hasher.update(std::process::id().to_le_bytes());
+        hasher.update(counter.to_le_bytes());
+        hasher.update(attempt.to_le_bytes());
+        let digest = hasher.finalize();
+        const HEX: &[u8; 16] = b"0123456789abcdef";
+        let mut out = [0u8; 8];
+        for i in 0..4 {
+            out[2 * i] = HEX[(digest[i] >> 4) as usize];
+            out[2 * i + 1] = HEX[(digest[i] & 0xF) as usize];
+        }
+        out
+    }
+
+    #[test]
+    fn suffix_is_eight_lowercase_hex() {
+        let suffix = temp_suffix(0, 0).expect("the clock reads");
+        assert_eq!(suffix.len(), 8);
+        assert!(suffix
+            .iter()
+            .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase()));
+    }
+
+    #[test]
+    fn suffix_is_not_the_public_draw() {
+        // On the Round 7 code this fails at the
+        // first pair, every time: the draw was
+        // the public function itself. With the
+        // clock in the mix, equality at any pair
+        // is a one-in-2^32 event per pair.
+        for (counter, attempt) in [(0, 0), (1, 1), (7, 3), (64, 64), (1000, 2)] {
+            let drawn = temp_suffix(counter, attempt).expect("the clock reads");
+            assert_ne!(drawn, public_draw(counter, attempt));
+        }
+    }
+
+    #[test]
+    fn suffix_varies_between_draws() {
+        // Same counter, same attempt, later
+        // clock: the draw must move. On the
+        // Round 7 code it never does.
+        let first = temp_suffix(5, 5).expect("the clock reads");
+        let mut moved = false;
+        for _ in 0..10_000 {
+            if temp_suffix(5, 5).expect("the clock reads") != first {
+                moved = true;
+                break;
+            }
+        }
+        assert!(moved);
     }
 }
