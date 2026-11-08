@@ -160,7 +160,7 @@ options:
 
 The score command is built and measures all six shapes. It reads flight tapes in the flighttape format, version 1.0, and writes the observations document to stdout or to a file. No other command is built, and no other run format is read.
 
-Closed perfection rounds, 7 of 100. A round counts only when a full cycle of work, audit, review, red team, and approval has closed.
+Closed perfection rounds, 8 of 100. A round counts only when a full cycle of work, audit, review, red team, and approval has closed.
 
 ## License
 
