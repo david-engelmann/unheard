@@ -110,13 +110,17 @@ unheard score rules.md tapes
 
 The one command is score. It takes a rules file and a directory of tapes, and it writes the observations document to stdout, or to a file with -o. Writing to a file prints nothing.
 
+The rules file is read as lists under headings. Each rule stands as a bullet item or a numbered item under a heading. A list item before any heading fails with an error naming its line, and a marker with no text after it fails the same way. Prose standing on its own is never inventoried as a rule, and a file of prose alone scores no rules at all.
+
 ```sh
 unheard score rules.md tapes -o observations.json
 ```
 
 The document is the one bluepencil consumes. Its observations come first, then the scores with their denominators, exercised of total and violations of exercised, never a bare rate. A rule never exercised is a different state from a rule never measured, and the document keeps the two apart in the unexercised and unmeasured lists.
 
-The rules it measures are the ones written in one of six checkable shapes. A named tool prohibited. A named path prohibited. A required ordering of two named tools. A required tool for files of a named kind. A numeric cap on one tool's calls in a session. The tool a session must open with. Every other rule is reported unmeasured, with the count published, and nothing is scored by guesswork.
+The rules it measures are the ones written in one of six checkable shapes, and a shape matches only when the rule's whole text follows its accepted wording, with one period allowed at the very end. A tool prohibition opens with Never use, Do not use, Never call, or Do not call, followed by the tool's name. A path prohibition opens with Never edit, Do not edit, Never modify, Do not modify, Never touch, or Do not touch, followed by the path written as one run with no spaces in it. An ordering opens with Run, Always run, Call, or Always call, followed by one tool's name, the word before, and the other tool's name. A required tool opens with Use or Always use and the tool's name, and ends with for and an extension with its dot and the word files, or with for files ending in and an extension with its dot. A cap opens with Never call or Do not call, the tool's name, more than, a count, and times, or with Call or Use, the tool's name, at most, a count, and times, or with At most, a count, calls to, and the tool's name. A first step opens with Start with, Always start with, Begin with, Always begin with, or The first call must be, followed by the tool's name. Every other rule is reported unmeasured, with the count published, and nothing is scored by guesswork. Do not ever use Grep states the same prohibition in other words and stands unmeasured.
+
+A path prohibition is exercised by any call whose input strings contain the path, whatever tool made the call, so a call that only reads the path counts as a violation.
 
 Unheard never writes to its inputs, and it says so when asked to.
 
@@ -160,7 +164,7 @@ options:
 
 The score command is built and measures all six shapes. It reads flight tapes in the flighttape format, version 1.0, and writes the observations document to stdout or to a file. No other command is built, and no other run format is read.
 
-Closed perfection rounds, 8 of 100. A round counts only when a full cycle of work, audit, review, red team, and approval has closed.
+Closed perfection rounds, 7 of 100. A round counts only when a full cycle of work, audit, review, red team, and approval has closed.
 
 ## License
 
