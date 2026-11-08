@@ -1,4 +1,4 @@
-//! UH-7 to UH-12, UH-13a, UH-14a, UH-23. Score
+//! UH-7 to UH-12, UH-13a, UH-14a, UH-23, UH-59. Score
 //! checkable rules against a tape set and emit the
 //! observations document.
 
@@ -348,6 +348,7 @@ pub fn score(
     let tapes_read = tapes_total + excluded.len() as i64;
     let unmeasured_count = unmeasured.len() as i64;
     let mut document = vec![
+        (Text::from_str("observations_version"), str_value("1.0")),
         (Text::from_str("observations"), Value::Array(observations)),
         (Text::from_str("scores"), Value::Array(scores)),
         (Text::from_str("unmeasured"), Value::Array(unmeasured)),

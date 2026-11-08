@@ -909,3 +909,225 @@ in the round dossier.
   (8 of 100) is untouched and still
   exact.
 
+- UH-57. The owed read-back of PR 10's
+  CodeRabbit record, completed before
+  this round's work began, finds one
+  item standing undisposed, and this
+  item disposes it. Review 5816559322's
+  four actionable items were disposed
+  in UH-56, three repaired and one
+  dismissed, with the bot's
+  acknowledgments standing on the
+  threads. The second shell, issue
+  comment 6717096849, states only that
+  the action was not completed because
+  the last commit was already reviewed;
+  it carries no findings. The undisposed
+  item is the failed Docstring Coverage
+  pre-merge check, standing in review
+  5816559322's body and in the summary
+  shell 6717023581, reporting 60.00
+  percent against an 80.00 percent
+  threshold over 5 functions analyzed.
+  It is dismissed on the ST-61 basis
+  (the touchstone VL-51 basis): the
+  check names no function, the
+  repository carries no docstring
+  configuration or threshold of its
+  own for it to enforce (its contract
+  carries no docstring rule and its
+  tree no docstring tool setting), and
+  the check applies the review tool's
+  default profile, so there is no repo
+  rule for it to enforce. There is
+  nothing to fix and nothing to
+  configure; the disposition is the
+  record.
+- UH-58. The temp-name draw's entropy
+  adjudication, measured, and the
+  repair. UH-50 mixed the wall-clock
+  nanoseconds into the draw to end the
+  pid-only exposure UH-49 convicted,
+  and the question this round settles
+  is the frozen clock: under a clock
+  frozen at a known reading the
+  nanoseconds term is a known constant,
+  so the 65 candidates of a fresh
+  process's single output write, the
+  pairs (counter, attempt) = (i, i)
+  for i in 0..=64, are computable again
+  by an observer who also fixes the
+  pid. Measured against the Round 8
+  binary as control, with the clock
+  held by interposition and the pid
+  fixed by a fresh namespace: at
+  1,700,000,000 seconds and 123,456,789
+  nanoseconds, pid 1, planting the 65
+  computed names refuses the control
+  with the cannot-write line and no
+  output left behind, and planting 64
+  writes on the 65th draw; at
+  1,800,000,000 seconds and 987,654,321
+  nanoseconds, pid 250, the 65 plants
+  refuse it again. The shipped draw
+  was plantable under a frozen known
+  clock. The repair takes the fleet's
+  WW-69 shape: 16 bytes read from
+  /dev/urandom for each candidate,
+  appended to the hash input after the
+  attempt term, the suffix still the
+  first four digest bytes as eight
+  lowercase hexadecimal characters,
+  and a failed or short entropy read
+  fails the draw so the write refuses
+  through the standing cannot-write
+  arm of UH-11. There is no fallback
+  source, and off unix, where no
+  source is contracted, the draw fails
+  the same way. Measured after the
+  repair, in the lane battery: the
+  same 65 plants at the first frozen
+  reading and pid 1 are inert and the
+  write lands byte-identical to its
+  unplanted document, the pre-epoch
+  posture of UH-51 still refuses
+  cleanly, and with every open of
+  /dev/urandom failing with EACCES
+  the write refuses with the directory
+  byte-identical before and after.
+  The oracle writes under the entropy
+  failure, as it writes under the
+  frozen clock: CPython's os.urandom
+  is served by the getrandom syscall,
+  which file interposition does not
+  reach, and its tempfile names are
+  seeded from that entropy, so no
+  observer-held input determines any
+  candidate on the oracle's side; the
+  repair brings the port to the same
+  standing, by the file source WW-69
+  contracts. The unit pins change
+  with the mix: the entropy term
+  deciding the suffix at fixed pid,
+  clock, counter, and attempt, and
+  the suffix matching an independent
+  derivation of the contracted mix,
+  are deterministic pins. The shape
+  pin and the not-the-public-draw pin
+  read the draw under the refusal
+  disjunction, a draw that refuses
+  asserting nothing. The
+  varies-between-draws pin is retired:
+  it required two live draws to
+  differ, which the WW-73 discipline
+  forbids requiring of a 32-bit draw.
+- UH-59. The observations document
+  carries a version key, and its full
+  shape is stated here, in unheard's
+  own contract, so the document can
+  be implemented and read from
+  unheard alone. This is a format
+  change and it changes the emitted
+  bytes: where the document opened
+  with the observations key, it now
+  opens with observations_version,
+  and every later byte is unchanged,
+  as the differential harness of UH-60
+  measures. The document is a JSON
+  object rendered as json.dumps
+  renders it, with an indent of two,
+  keys in the order stated here, and
+  non-ASCII characters unescaped, with
+  a trailing newline. Its keys, in
+  order: observations_version, the
+  string "1.0". observations, a list
+  of objects, one per exercised event,
+  each carrying rule (the rule's exact
+  text), kind (followed, ignored, or
+  misreading), and quote (the word
+  tape, the tape's canonical form 1
+  digest, the word seq, and the
+  event's seq, with a misreading's
+  quote adding the word used and the
+  tool actually used). scores, a list
+  in rule order of objects carrying
+  rule, shape (prohibit-tool,
+  prohibit-path, ordering,
+  required-tool, cap, first, or
+  unmeasured for a rule no shape
+  matches), tapes_exercised,
+  tapes_total, events_exercised, and
+  violations, all counts. unmeasured,
+  the texts of the unmeasured rules.
+  unmeasured_count, their count.
+  unexercised, the texts of the
+  measured rules no tape exercised.
+  tapes, an object carrying read,
+  scored, and excluded, the excluded
+  a list of objects carrying file,
+  reason, and defects. duplicates,
+  the texts of rules stated more than
+  once, and warnings, the parse
+  warnings, stand after tapes, in
+  that order, each present only when
+  non-empty. The version's law:
+  version "1.0" names exactly this
+  shape; a change to the shape that a
+  reader of "1.0" cannot absorb is a
+  new version, never a silent edit of
+  this one. UH-8 and UH-12a defer to
+  bluepencil's BP-6 for the shape
+  bluepencil consumes, and BP-6's text
+  names the observations list and its
+  entries; the version key and the
+  rest of the document's keys stood
+  specified nowhere until this item.
+  Bluepencil reads the document
+  through its observations key, so the
+  added first key does not disturb
+  the consuming side as it stands;
+  the consuming half, reading and
+  checking the version, lands in
+  bluepencil's own round, not this
+  one. The README's Status states the
+  emitted version, and its first
+  screen capture is regenerated to
+  the new shape and verified
+  byte-for-byte against a real run of
+  the Quickstart. The version is
+  pinned in tests/test_scoring.rs:
+  the emitted document's first bytes
+  are the version key and its parsed
+  value is the string "1.0".
+- UH-60. The differential harness
+  gains two cases and a comparison
+  rule, 15 cases and 134 steps in
+  all, running clean against the
+  repaired binary. The comparison
+  rule carries UH-59's contracted
+  split: compare strips the version
+  line, and only the version line,
+  from any document a side emits, so
+  every twin comparison still asserts
+  the version line is the only
+  difference between the port's
+  document and the oracle's. The
+  frozen clock plant case runs both
+  sides at pid 1 and at pid 250 under
+  the fixed readings of UH-58 with
+  the 65 computed names of the
+  clock-only mix planted in both
+  trees, and the twins agree, the
+  plant inert on the repaired draw.
+  The entropy source failure case
+  runs both sides under the EACCES
+  interposition of UH-58 and asserts
+  the contracted split exactly: the
+  oracle writes its baseline
+  document, and the port refuses
+  with the cannot-write line and the
+  tree left exactly as seeded.
+- UH-61. README records 9 of 100 only
+  in the closure commit written after
+  this round's three reviews, fixes,
+  and owner verification.

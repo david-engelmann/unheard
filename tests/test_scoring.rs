@@ -1,4 +1,4 @@
-//! UH-5 to UH-12, UH-13a, UH-14a, UH-16. Obedience
+//! UH-5 to UH-12, UH-13a, UH-14a, UH-16, UH-59. Obedience
 //! scoring for checkable rules, ported from the
 //! Python suite file for file. The CLI cases drive
 //! the compiled binary.
@@ -294,6 +294,36 @@ fn an_invalid_tape_is_excluded_with_its_defects_named() {
     assert!(defects
         .iter()
         .any(|defect| as_text(defect) == "tape_version is not 1.0"));
+}
+
+#[test]
+fn the_document_carries_its_version_first() {
+    // UH-59: the emitted document opens with
+    // observations_version, the string "1.0",
+    // ahead of every other key.
+    let base = temp_dir("version");
+    let tapes = tape_dir(&base, &["tape_a.json"]);
+    let out = base.join("observations.json");
+    let run = run_cli(
+        &[
+            "score",
+            fixture("rules_synthetic.md").to_str().expect("a path"),
+            tapes.to_str().expect("a path"),
+            "-o",
+            out.to_str().expect("a path"),
+        ],
+        None,
+    );
+    assert_eq!(run.code, 0);
+    let bytes = std::fs::read(&out).expect("the output file");
+    let text = String::from_utf8(bytes).expect("utf-8 output");
+    assert!(
+        text.starts_with("{\n  \"observations_version\": \"1.0\",\n  \"observations\":"),
+        "the document does not open with its version: {}",
+        &text[..text.len().min(80)]
+    );
+    let document = parse_output(&std::fs::read(&out).expect("the output file"));
+    assert_eq!(as_text(get(&document, "observations_version")), "1.0");
 }
 
 #[test]
