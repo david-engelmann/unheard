@@ -21,14 +21,36 @@ fn fixture(name: &str) -> PathBuf {
         .join(name)
 }
 
-fn temp_dir(tag: &str) -> PathBuf {
+/// A temp directory that removes itself on
+/// drop, so a failed assertion cleans up the
+/// same way a passing run does. The bare path
+/// leaked one root per call site per run
+/// before this guard (the Round 9 standards
+/// Minor, recorded in UH-62).
+struct TempDir(PathBuf);
+
+impl std::ops::Deref for TempDir {
+    type Target = PathBuf;
+
+    fn deref(&self) -> &PathBuf {
+        &self.0
+    }
+}
+
+impl Drop for TempDir {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
+fn temp_dir(tag: &str) -> TempDir {
     let nanos = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .expect("a clock")
         .as_nanos();
     let dir = std::env::temp_dir().join(format!("unheard-{tag}-{}-{nanos}", std::process::id()));
     std::fs::create_dir_all(&dir).expect("a temp dir");
-    dir
+    TempDir(dir)
 }
 
 fn tape_dir(base: &Path, names: &[&str]) -> PathBuf {

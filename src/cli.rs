@@ -1004,10 +1004,11 @@ fn mix_suffix(pid: u32, nanos: u128, counter: u32, attempt: u32, entropy: &[u8; 
 /// and the entropy term is what keeps it from
 /// being a public function of the process id
 /// and a known clock together (UH-58, measured
-/// there: under a frozen clock the clockless
+/// there: under a frozen clock the clock-only
 /// mix's 65 candidates were computable from
-/// the pid alone, and planting all 65 exhausted
-/// the retry loop exactly as the pid-only draw
+/// the pid plus the known frozen clock
+/// reading, and planting all 65 exhausted the
+/// retry loop exactly as the pid-only draw
 /// had). A clock that reads before the epoch
 /// fails the draw, and an entropy read that
 /// fails or comes up short fails it too; either
