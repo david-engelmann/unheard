@@ -1294,10 +1294,11 @@ in the round dossier.
   (235 rules, 27 tapes read and 24
   scored with 3 excluded, 5,276
   events) yields 234 score entries
-  across all six shapes (61
+  across all seven shapes (61
   prohibit-tool, 40 prohibit-path,
   30 ordering, 30 required-tool, 32
-  cap, 20 first) and 42,941
+  cap, 20 first, 21 unmeasured)
+  and 42,941
   observations (12,661 followed,
   6,008 ignored, 24,272
   misreading), with 21 unmeasured,
