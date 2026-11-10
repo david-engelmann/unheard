@@ -1163,3 +1163,169 @@ in the round dossier.
   The suffix is a plant resistance
   measure only, as WW-69 states for
   its own draw.
+- UH-63. Round 9's second CodeRabbit
+  review 5819827425, posted on the
+  repair head 9c39dff9 after the
+  first review's record had closed,
+  carried one inline comment,
+  4507950835, a Minor at README.md
+  line 168: keep the closed-round
+  count at 8 until the closure
+  conditions are met. It is
+  dismissed, and its ground is
+  stated exactly. The line it names
+  is the closure commit's line, and
+  a closure commit takes effect on
+  main only at the merge. Main at
+  the round's base read 8 of 100,
+  and it read 8 of 100 at every
+  moment before the merge; the
+  merge 3504b1ee landed only after
+  the three reviews, the repair
+  commit, the three delta reviews
+  on the repair, and the owner's
+  verification, as the landing
+  comment 6727877771 records. No
+  reader of main was ever shown 9
+  of 100 before the conditions the
+  line counts were met, and the
+  line on main today is true.
+  There is nothing to repair. The
+  review's summary shell 6726437711
+  repeats the item as its merge
+  risk note and carries no second
+  finding in it, and the remaining
+  shell, issue comment 6726484655,
+  states the action was not
+  completed because the review was
+  rate limited, and carries no
+  findings.
+- UH-64. The same review's body
+  carries the failed Docstring
+  Coverage pre-merge check a second
+  time, in its prompt section, with
+  no figure and no function named;
+  the figure stands in the summary
+  shell 6726437711 at 57.14 percent
+  against 80.00 percent over 7
+  functions, the item UH-62 already
+  dismissed citing that shell. It
+  is the same check on the same
+  diff, and it is dismissed on the
+  basis UH-57 states: it names no
+  function, the repo carries no
+  docstring configuration or
+  threshold of its own, and the
+  check applies the review tool's
+  default profile, so there is no
+  repo rule for it to enforce.
+- UH-65. The observations document's
+  emitting half, measured fresh
+  against the Python oracle (the
+  archive of 03658d9 at uh-oracle,
+  its fixture blobs verified
+  against main's tree before any
+  cell was trusted; the port's
+  emitting sources are
+  blob-identical to the Round 9
+  head's). At the fixture size the
+  port's document is 2,463 bytes
+  and the oracle's 2,430, and the
+  port's document is the oracle's
+  with exactly the version line
+  inserted after the opening brace,
+  in file and stdout modes alike.
+  At realistic size (235 rules, 24
+  tapes, 5,276 events) the document
+  is 8,181,065 bytes, its first
+  keys are observations_version and
+  observations in that order, the
+  parsed version is the string
+  "1.0", and stripping the version
+  line leaves the oracle's document
+  byte for byte. No other byte
+  differs from UH-59's law.
+- UH-66. The draw's entropy posture,
+  measured fresh. The 65-plant
+  clock-only shape of UH-58 stays
+  inert at both frozen readings of
+  that item, 1,700,000,000 seconds
+  and 123,456,789 nanoseconds at
+  pid 1 and 1,800,000,000 seconds
+  and 987,654,321 nanoseconds at
+  pid 250: the write lands and the
+  document is byte-identical to its
+  unplanted baseline. Entropy
+  failure refuses both ways it can
+  arrive. With every open of
+  /dev/urandom failing with EACCES
+  the write refuses with the
+  cannot-write line and the
+  directory byte-identical as
+  seeded, and with those opens
+  redirected to a file holding five
+  bytes, so the read succeeds but
+  is short, the write refuses the
+  same way with the directory as
+  seeded; the short-read cell is
+  new this round. The pre-epoch
+  posture of UH-51 stands: the port
+  refuses cleanly and the oracle
+  writes, the contracted split.
+- UH-67. The hearing surfaces least
+  recently measured, measured
+  fresh. The pick: shape
+  classification and its order
+  (UH-6a, UH-13b, UH-15), per-event
+  exercise and violation counting
+  with quote formation (UH-7a,
+  UH-8a, UH-13a, UH-14a), and the
+  inventory sections (UH-8b,
+  UH-12a, UH-20). The ground: every
+  dedicated measurement item from
+  Round 4 onward measures the write
+  seam (UH-25a through UH-53,
+  UH-58) or the version key (UH-59,
+  UH-60); these surfaces were last
+  dedicated-measured in the Round 3
+  port differential and since then
+  only in the harness's fixed small
+  cells. The fresh corpus of UH-65
+  (235 rules, 27 tapes read and 24
+  scored with 3 excluded, 5,276
+  events) yields 234 score entries
+  across all six shapes (61
+  prohibit-tool, 40 prohibit-path,
+  30 ordering, 30 required-tool, 32
+  cap, 20 first) and 42,941
+  observations (12,661 followed,
+  6,008 ignored, 24,272
+  misreading), with 21 unmeasured,
+  100 unexercised, and 1 duplicate,
+  and warnings stand empty on both
+  sides, the key absent from both
+  documents; the twins agree byte
+  for byte once the version line is
+  stripped. A grid of 20
+  classification edge cells (the
+  cap at 0, 1, and 18 digits, 18
+  digits with leading zeros, the
+  18-digit maximum, the 19-digit
+  overflow, digits in another
+  script, both at-most forms, the
+  trailing-period arms, the
+  first-step forms, and a lowercase
+  non-match among them) agrees in
+  all 20 cells. No conviction;
+  nothing is repaired.
+- UH-68. The differential harness
+  stands at 15 cases and 134 steps,
+  running clean against this
+  round's build, and is unchanged
+  this round: no case convicted, so
+  no case was added.
+- UH-69. README records 10 of 100
+  only in the closure commit
+  written after this round's three
+  reviews, fixes, and owner
+  verification.
