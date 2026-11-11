@@ -1330,3 +1330,230 @@ in the round dossier.
   written after this round's three
   reviews, fixes, and owner
   verification.
+
+## Round 11. The launch witness, the walk boundary, and the entropy read (UH-70 to UH-77)
+
+- UH-70. The owed read-back of PR 12's
+  CodeRabbit record, completed before this
+  round's work began, on the UH-56 pattern.
+  The record stands: zero reviews and zero
+  review comments on the review endpoints,
+  and four issue comments. The trigger
+  (6759320681) carries nothing. The summary
+  shell 6759322226, edited in place to its
+  final form at 2026-11-10T05:39:37Z, stands
+  in two parts. Its recent-review part
+  (Run ID fa9a25c4-1532-4c54-85e4-394da91f7e61)
+  reviews the pull request from the base
+  894a7bd4 to the closure head 3f12ac78 over
+  two files, CONTRACT.md and README.md, and
+  its pre-merge checks stand at 4 passed and
+  none failed: Description Check, Title
+  check, Linked Issues check, and Out of
+  Scope Changes check, each Passed. No
+  Docstring Coverage failure stands in this
+  shell, a change from Rounds 9 and 10.
+  Its Merge Risk stands at Minimal, previous
+  review 3f12a, its coverage naming the
+  closure head 3f12ac78 as the covered
+  commit, and its text states that the
+  documentation and status update are ready
+  to merge and that the count wording
+  discrepancy does not affect behavior. Its
+  later part (Run ID
+  58d5dab4-93bd-4641-8bb3-4b9d88f754c3) is a
+  rate limit notice, Review limit reached,
+  covering the range from 3f12ac78 to the
+  repair head 3a4ed402 over the one file
+  CONTRACT.md, and it records that no
+  actionable comments were generated in the
+  recent review. The remaining bot shell,
+  6759421759, states only that the action
+  was not completed because the last commit
+  was already reviewed; it carries no
+  findings. The disposition: no actionable
+  comment, no inline comment, and no failed
+  check stands anywhere in PR 12's
+  CodeRabbit record, so there is nothing to
+  fix and nothing to dismiss, and the
+  absence is the disposition. The Merge
+  Risk note's count wording discrepancy is
+  not a CodeRabbit finding: it carries no
+  comment and no check, and the discrepancy
+  it names is the UH-67 count sentence the
+  owner's standards review found, repaired
+  in 3a4ed402 before the merge and passed
+  by both delta reviews, as the owner's
+  landing comment 6760070827 records. The
+  repair head 3a4ed402 was never reviewed
+  by CodeRabbit; its review is the owner's,
+  and this item rests on the whole record
+  read to its ends, not on any merge-time
+  read.
+- UH-71. The fresh gate and the regression
+  of UH-65 to UH-67, measured at the base
+  (the Round 10 merge 3b0245e1, its tree
+  verified blob for blob against the API
+  tree before any cell was trusted). The
+  oracle pairing stands as UH-65 verifies
+  it: the archive of the Python final
+  commit 03658d9, its five fixture blobs
+  hashing to exactly the base tree's
+  blobs, and its own suite passing 28.
+  The gate at the base and again on this
+  round's final tree: cargo test 33
+  passed and 0 failed (4 unit, 24 scoring,
+  5 shapes), clippy with warnings denied
+  clean, fmt clean, and the codepoint scan
+  at zero for both dashes. The Round 10
+  battery rerun against this round's build
+  passes every cell with its Round 10
+  numbers unchanged: the fixture document
+  at 2,463 bytes against the oracle's
+  2,430 with exactly the version line
+  inserted, the realistic corpus (235
+  rules, 27 tapes read and 24 scored with
+  3 excluded, 5,276 events) yielding the
+  8,181,065-byte document and 42,941
+  observations, the 65 clock-only plants
+  inert at both frozen readings and pids,
+  the entropy open refusal and short read
+  refusals, the pre-epoch split, and the
+  classification edge grid agreeing in
+  all 20 cells.
+- UH-72. The launch witness, measured
+  fresh: the port's closed_at_launch read
+  of /proc/self/fd and fdinfo (src/util.rs),
+  a surface no earlier item contracts.
+  Twin cells launch both sides with a
+  standard stream closed at launch. The
+  twins agree exactly, exit and surviving
+  stream bytes alike, in every cell but
+  one. Help with stdout closed lands on
+  stderr at exit 0, and with stderr closed
+  lands on stdout at exit 0. A parse error
+  with stderr closed puts the usage line
+  alone on stdout at exit 2, its error
+  line lost on both sides; with both
+  streams open the control puts usage and
+  error on stderr at exit 2. An error line
+  with stderr closed migrates to stdout at
+  exit 1 in all three of its shapes: the
+  missing rules file (error, no such rules
+  file), the guard's refusal (error,
+  unheard never writes to its inputs), and
+  the cannot-write line naming its output.
+  A successful score with stderr closed
+  puts its document on stdout at exit 0,
+  the port's document the oracle's with
+  exactly the version line inserted. A
+  stream aimed at /dev/null in the
+  ordinary write-only way reads as present
+  on both sides: help exits 0 and nothing
+  reaches stderr. The one split: a score
+  to stdout with stdout itself closed at
+  launch. The port exits 1 silently,
+  nothing on the surviving stream and no
+  document anywhere; the oracle exits 1
+  with a traceback on stderr, its
+  sys.stdout standing as None at the write
+  (AttributeError at the oracle cli.py's
+  stdout write). The exits agree and no
+  byte is emitted on either side; only the
+  clothing differs, the crash clothing
+  UH-17 already contracts. No conviction;
+  nothing is repaired.
+- UH-73. The resolver walk's budget,
+  measured fresh at its boundary (UH-25a).
+  A chain of nested symlink splices names
+  the output. At 989 and at 990 splices
+  both sides pass the guard and refuse at
+  the write, byte-identical on both sides:
+  exit 1 and the cannot-write line naming
+  the spelled output, nothing landed; the
+  cannot-write line is the evidence the
+  write stage was reached, since the crash
+  class wears no line. At 991 and at 992
+  the guard's resolution itself fails, in
+  the crash class of UH-17: the port exits
+  1 silently and the oracle exits 1 under
+  a RecursionError traceback, nothing
+  landed on either side. The boundary
+  stands exactly where UH-25a puts it:
+  990 nested splices resolve, the 991st
+  fails. A sequential spelling, two chains
+  of 600 splices in one output path (1,200
+  splices in total, no nesting deeper than
+  600), passes the guard on both sides and
+  refuses with the same byte-identical
+  cannot-write line, so the budget counts
+  nesting depth and not splices in total,
+  as UH-25a states.
+- UH-74. The entropy read's semantics,
+  measured fresh (UH-58, UH-66), under a
+  counting and shaping interposition on
+  /dev/urandom. One file-mode write with
+  no collision opens /dev/urandom exactly
+  once and reads exactly 16 bytes in one
+  read; a stdout-mode score opens it zero
+  times, no candidate being drawn when no
+  temp is created. A chunked source, its
+  reads capped at five bytes per call
+  against the real source, still lands the
+  write, its document byte-identical to
+  its baseline: the port's reads run 5, 5,
+  5, and 1, summing to the candidate's 16
+  bytes, so a short read that is not the
+  end of the source is absorbed by the
+  read's own looping, and only the
+  end-of-source short reads of UH-66
+  refuse. The refusal arm takes one more
+  shape: opens redirected to a directory
+  succeed at the open and fail at the read
+  (the counting log records one open and
+  one read returning -1), and the write
+  refuses with the cannot-write line and
+  the directory byte-identical as seeded.
+  An empty source, zero bytes, refuses on
+  the same arm as UH-66's five-byte file.
+  The redraw path's open count stands
+  unmeasured: a collision cannot be forced
+  against an entropy draw from outside the
+  process, so no cell counts a second
+  candidate's opens, and this item claims
+  none.
+- UH-75. The document's remaining joints
+  of UH-65 and UH-67, measured fresh. At
+  realistic size in stdout mode (the
+  corpus of UH-71) the port's stdout
+  document is byte-identical to its own
+  file document at 8,181,065 bytes, and
+  stripping its version line leaves the
+  oracle's stdout document byte for byte;
+  UH-65 measured the stdout agreement at
+  the fixture size only, and it stands at
+  realistic size too. A warnings-present
+  corpus, a rules file carrying a
+  duplicate rule and an unclosed fence,
+  agrees between the twins byte for byte
+  once the version line is stripped. Its
+  document's keys run in UH-59's order
+  with the two conditional keys live and
+  trailing in their stated order,
+  duplicates then warnings: duplicates
+  carries the one repeated text, and
+  warnings carries the one warning, the
+  unclosed fence at its line with the rest
+  of the file read as code. UH-67's fresh
+  corpus carried warnings empty on both
+  sides with the key absent; the key's
+  present shape is measured here.
+- UH-76. The differential harness stands
+  at 15 cases and 134 steps, running clean
+  against this round's build, and is
+  unchanged this round: no case convicted,
+  so no case was added.
+- UH-77. README records 11 of 100 only in
+  the closure commit written after this
+  round's three reviews, fixes, and owner
+  verification.
