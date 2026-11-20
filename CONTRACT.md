@@ -1557,3 +1557,219 @@ in the round dossier.
   the closure commit written after this
   round's three reviews, fixes, and owner
   verification.
+
+## Round 12. The read-back, the tape directory's enumeration, and the degenerate inputs (UH-78 to UH-82)
+
+- UH-78. The owed read-back of PR 13's
+  CodeRabbit record, read back whole
+  through the API. PR 13 stands merged
+  at cf4858f6, its parents 3b0245e1 and
+  the closure head 1bf2c5ae, the merge
+  tree 2c34dc67 identical to the
+  reviewed head tree, and the README
+  on main recording 11 of 100. The
+  body stands in its final patched
+  form at 17,819 bytes, the bot's
+  release-notes appendix at 689 bytes
+  preserved byte for byte through
+  both completion lane patches, its
+  corrected CI attribution naming
+  both hosted runs on the closure
+  head and none on the slice head.
+  The census at this read-back: four
+  issue comments, zero reviews, zero
+  review comments. Three comments
+  stood at landing (the trigger, the
+  summary shell, and the follow-up);
+  the fourth is the owner's landing
+  comment 6945325111 itself, posted
+  after the merge, and no CodeRabbit
+  comment was posted after the
+  landing, so nothing post-landing
+  stands to disposition. The shell
+  6804891086 in the form standing at
+  this read-back is 10,646 characters,
+  last edited 2026-11-17T05:33:00Z,
+  its coverage naming the closure
+  head 1bf2c5ae as both source and
+  covered commit, pre-merge checks
+  at 4 passed and none failed (Title,
+  Linked Issues, Out of Scope,
+  Description), Merge Risk at
+  Minimal, Run ID
+  6e42fa9a-c988-45ee-9012-a7a01f857686,
+  no Docstring Coverage row, and the
+  sentence that no actionable
+  comments were generated in the
+  recent review. The completion lane
+  first recorded the shell at 10,642
+  characters last edited
+  2026-11-11T19:15:13Z; it was edited
+  once more, four characters longer,
+  with every disposition-bearing
+  element unchanged. The follow-up
+  6805054660 states only that the
+  action was not completed because
+  the last commit was already
+  reviewed. There is nothing to fix
+  and nothing to dismiss, and the
+  absence is the disposition. The
+  landing comment closes the
+  battery11 X989 and X990 question
+  on the reviews' evidence: the two
+  cells were the completion lane's
+  own mis-specification, UH-73
+  stands as written, and no repair
+  round is owed. Two observations
+  the landing comment charges are
+  dispositioned here. First, UH-73's
+  text does not spell its output
+  construction; this round's
+  measurement family does not touch
+  the resolver walk, so the
+  observation is carried by name:
+  the head-spelling posture (a head
+  spelling replaces the chain's head
+  link itself and lands at exit 0 on
+  both sides; a through-chain
+  spelling refuses at the write; the
+  guard resolves through 990 splices
+  and fails at the 991st under every
+  construction) stands on the Round
+  11 reviews' reproduction,
+  uncontracted by any item, and is
+  owed to the next round whose
+  family touches the walk. Second,
+  UH-77's closure form: the closure
+  commit precedes the reviews, as in
+  Round 10 and Round 11, and the
+  substance is satisfied because
+  the owner merges only after the
+  reviews; this round's closure
+  item UH-82 follows the honest
+  form and says so in its own text.
+- UH-79. The tape directory's
+  enumeration and the degenerate
+  inputs, measured fresh against
+  the Python oracle, a surface no
+  earlier item contracts: UH-5
+  names the inputs, UH-10 the
+  filename order, and UH-5a the
+  subset checks a file must pass
+  once read, but the candidate set
+  of a directory and the degenerate
+  inputs stood unmeasured. Every
+  regular file in the directory is
+  a candidate, whatever its name:
+  a plain-text file is read and
+  excluded as not valid JSON, and
+  valid tapes under a name with no
+  extension, a text extension, a
+  dotfile name, an uppercase JSON
+  extension, and a name holding a
+  space are all read and scored;
+  the extension is never consulted.
+  Subdirectories are skipped
+  silently, including one named
+  like a tape. Symlinks are
+  followed both out of the
+  directory and into it, with no
+  path identity anywhere in the
+  document: three read, three
+  scored, nine observations; a
+  broken symlink is skipped
+  silently. The filename order is
+  codepoint order (0bad.json,
+  10.json, 2.json, B.json, a.json,
+  z.json, é.json), identical for
+  forward and reverse creation
+  orders, the malformed 0bad.json
+  excluded for its own defect, six
+  observations in all. The
+  degenerate inputs score cleanly:
+  an empty tape directory reads
+  zero, scores six, and leaves
+  five unexercised; a zero-event
+  tape is excluded as not a valid
+  tape with the defect that events
+  must hold at least one event; an
+  empty rules file and a
+  headings-only rules file both
+  produce the minimal 176-byte
+  document with zero scores and
+  zero observations. The same
+  content under two names is
+  scored twice, once per name,
+  with no deduplication, and file
+  mode with an output path outside
+  the tapes directory agrees byte
+  for byte. The twins agreed in
+  every cell: exit, stderr, the
+  input tree untouched, and the
+  document byte for byte once the
+  port's version line is stripped.
+  No conviction; nothing is
+  repaired.
+- UH-80. The fresh gate and the
+  regression of UH-65 to UH-67 and
+  UH-72 to UH-75, measured at the
+  base (the Round 11 merge
+  cf4858f6, its tree verified blob
+  for blob against the API tree
+  before any cell was trusted). The
+  oracle pairing stands as UH-65
+  verifies it: the archive of the
+  Python final commit 03658d9, its
+  five fixture blobs hashing to
+  exactly the base tree's blobs,
+  and its own suite passing 28.
+  The gate at the base and again on
+  this round's final tree: cargo
+  test 33 passed and 0 failed (4
+  unit, 24 scoring, 5 shapes),
+  clippy with warnings denied
+  clean, fmt clean, and the
+  codepoint scan at zero for both
+  dashes. The regression batteries
+  stand as they stood. battery10
+  passes whole: the fixture and
+  realistic version shapes (the
+  realistic corpus at 235 rules,
+  24 tapes, 5,276 events, and
+  42,941 observations over an
+  8,181,065-byte document), the
+  launch witness cells, and the
+  classification edge grid at 20
+  of 20. battery11 passes 18 cells
+  across six byte-identical runs,
+  and its two remaining cells are
+  read as the settlement of
+  UH-78's read-back, not as a new
+  conviction: X989 and X990 still
+  carry the Round 11 instrument's
+  refusal expectation, and both
+  arms instead land the write by
+  head-link replacement at exit 0,
+  the tree changed at the head
+  link alone, while X991 and X992
+  stand in the crash class and the
+  sequential-splice cell stands as
+  contracted.
+- UH-81. The differential harness
+  stands at 15 cases and 134 steps,
+  running clean against this
+  round's build (0 failures, the
+  build's sha256 verified identical
+  at the harness's standing path),
+  and is unchanged this round: no
+  case convicted, so no case was
+  added.
+- UH-82. README records 12 of 100
+  only in the closure commit. The
+  closure commit is written before
+  this round's three reviews, in
+  the standing form of UH-69 and
+  UH-77, and the record takes
+  effect only when the owner
+  merges after the reviews, fixes,
+  and owner verification.
