@@ -2450,3 +2450,193 @@ in the round dossier.
   record takes effect only when the
   owner merges after the reviews,
   fixes, and owner verification.
+
+## Round 16. The read-back, the standing regression, and the rules file's line-boundary surface (UH-98 to UH-102)
+
+- UH-98. The owed read-back of PR 20's
+  record, read back whole through the
+  API. PR 20 stands merged at 5f1a7bc6,
+  its single parent 2cfab7cf, the merge
+  tree f7c1edb4 identical to the
+  reviewed closure head tree, and the
+  README on main recording 15 of 100.
+  The body stands in its final form at
+  12,949 characters, the lane body at
+  10,107 characters with the bot's
+  release-notes appendix at 588
+  characters from its marker at char
+  9,519, the owner completion record
+  appended to it (2,842 characters with
+  its leading blank lines, its heading
+  at char 10,109) with the three
+  reviews APPROVE on every axis. The
+  census at this read-back: four issue
+  comments, zero reviews, zero review
+  comments. Three comments stood at the
+  owner record (the Trunk merged note,
+  the summary shell, and the lane's
+  merge request); the fourth is the
+  owner's landing comment 7053312318
+  itself, posted after the merge, and
+  no CodeRabbit comment was posted
+  after the landing, so nothing
+  post-landing stands to disposition.
+  The shell 7051040137 in its true
+  final form at this read-back is
+  11,312 characters, last edited
+  2026-11-20T21:31:28Z, its change
+  assessment naming the closure head
+  f24d8134, pre-merge checks at 4
+  passed and none failed, Merge Risk
+  at Minimal, Run ID
+  e5ac1af9-e0f9-43ac-a99d-b0e67d37c1b8,
+  and the sentence that no actionable
+  comments were generated in the recent
+  review. The build lane first recorded
+  the shell at 11,310 characters in the
+  body at its earlier edited stamp; the
+  owner record states it at 11,312
+  characters, two characters longer,
+  with every disposition-bearing
+  element unchanged, and this read-back
+  confirms 11,312 as its true final
+  form. Its one style observation, the
+  title long and dense at 173
+  characters with the verdict
+  unchanged, stands recorded in the
+  body. There is nothing to fix and
+  nothing to dismiss, and the absence
+  is the disposition.
+- UH-99. The standing regression, in
+  the contracted forms, measured at the
+  base (the Round 15 merge 5f1a7bc6,
+  its tree verified blob for blob
+  against the API tree before any cell
+  was trusted). The oracle pairing
+  stands as UH-65 verifies it: the
+  archive of the Python final commit
+  03658d9, tree ffa48f27, verified blob
+  for blob against the driven copy at
+  this round's hand, and its own suite
+  passing 28. The gate at the base and
+  again on this round's final tree:
+  cargo test 33 passed and 0 failed (4
+  unit, 24 scoring, 5 shapes), clippy
+  with warnings denied clean, fmt
+  clean, from untruncated captures at
+  both trees, and the two builds
+  byte-identical. battery10 passes
+  whole: ALL PASS, the realistic corpus
+  at 235 rules, 24 tapes, 5,276
+  events, and 42,941 observations over
+  an 8,181,065-byte document.
+  battery11 stands at its settled
+  posture: 18 PASS, and exactly the two
+  settled cells X989 and X990 failing
+  against the Round 11 instrument's
+  refusal expectation while both arms
+  land the write by head-link
+  replacement at exit 0, read as the
+  settled mis-specification from PR
+  13's landing, not a conviction;
+  X991 and X992 stand in the crash
+  class and the sequential-splice cell
+  stands as contracted. battery12
+  stands whole at UH-79's dispositions
+  as contracted in UH-83: eighteen PASS
+  lines, FAILURES: 0. battery13 stands
+  whole at UH-85's dispositions: R1 to
+  R8 all PASS with the variants-equal-
+  control cross-check, FAILURES: 0.
+  battery14 stands whole at UH-90's
+  dispositions: T1 to T8 all PASS with
+  both cross-checks, FAILURES: 0.
+  battery15 stands whole at UH-95's
+  dispositions: V1 to V9 all PASS with
+  both cross-checks, FAILURES: 0. The
+  differential harness stands at 15
+  cases and 134 steps, running clean
+  against this round's build (0
+  failures, the build's sha256 verified
+  identical at the harness's standing
+  path), the harness file unmodified,
+  and is unchanged this round: no case
+  convicted, so no case was added. The
+  Quickstart capture reproduces the
+  README's first-screen document byte
+  for byte at 1,687 bytes, exit 0, from
+  the synthetic rules against the
+  synthetic tape.
+- UH-100. The rules file's
+  line-boundary surface, measured fresh
+  against the Python oracle, a surface
+  no earlier item contracts in its
+  scoped form: the contract holds no
+  count for any line boundary beyond
+  the LF, CR, and CRLF endings UH-85
+  measured, Round 15 measured the tape
+  file's value-shape surface, Round 14
+  the tape file's byte surface, and
+  Round 12 the tape directory's
+  candidacy and the degenerate inputs
+  at plain shipped constructions. Its
+  novelty stands scoped against its
+  standing neighbours by name: UH-22
+  contracts the rules decode discipline
+  itself, that the rules file decodes
+  as utf-8-sig and a read or decode
+  failure is the named cannot-read
+  refusal, and UH-85's cell R7
+  re-measures that refusal; UH-85's
+  fresh part stands as its byte-surface
+  counts and mark and ending behaviour
+  at LF family bytes alone. Both rules
+  readers split the decoded text under
+  the interpreter's splitlines
+  discipline, and the twins agreed in
+  every cell: exit, stderr, the input
+  tree untouched, and the document byte
+  for byte once the port's version line
+  is stripped. Every LF byte of the
+  synthetic rules file replaced by a
+  vertical tab, a form feed, a file
+  separator, a group separator, a
+  record separator, a next line, a line
+  separator, or a paragraph separator
+  each reproduces the control's
+  document byte for byte on both arms,
+  the tape read and scored once, six
+  scores and one observation: each
+  boundary scalar ends a line where the
+  LF stood, and each varied file holds
+  exactly the control's eight boundary
+  encodings. The family ran in stdout
+  mode only and never named an output,
+  so it does not touch the resolver
+  walk. No conviction; nothing is
+  repaired.
+- UH-101. UH-73's text does not spell
+  its output construction; this round's
+  measurement family does not touch the
+  resolver walk, so the observation is
+  carried by name again: the
+  head-spelling posture (a head spelling
+  replaces the chain's head link itself
+  and lands at exit 0 on both sides; a
+  through-chain spelling refuses at the
+  write; the guard resolves through 990
+  splices and fails at the 991st under
+  every construction) stands on the
+  Round 11 reviews' reproduction,
+  uncontracted by any item, and is owed
+  to the next round whose family touches
+  the walk.
+- UH-102. README records 16 of 100
+  only in the closure commit. The
+  closure commit is written before
+  this round's three reviews, in the
+  standing form of UH-69, UH-77, UH-82,
+  UH-87, UH-92, and UH-97, and the
+  record takes effect only when the
+  owner merges after the reviews,
+  fixes, and owner verification.
