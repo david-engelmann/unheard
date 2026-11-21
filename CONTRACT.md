@@ -2873,3 +2873,243 @@ in the round dossier.
   the record takes effect only when the
   owner merges after the reviews,
   fixes, and owner verification.
+
+## Round 18. The read-back, the standing regression, and the rules file's block-closure surface (UH-109 to UH-113)
+
+- UH-109. The owed read-back of PR 24's
+  record, read back whole through the
+  API. PR 24 stands merged at 3d5b3431,
+  its single parent 042d4b29, the merge
+  tree 33cebe0c identical to the
+  reviewed closure head tree, and the
+  README on main recording 17 of 100.
+  The body stands in its final form at
+  17,961 characters, the lane body at
+  12,865 characters, the owner
+  completion record appended to it
+  (5,096 characters with its leading
+  blank lines) with the three reviews
+  APPROVE on every axis (spec three
+  record-only Minors, standards one
+  record-only Minor, red team no
+  findings against the slice, one
+  record-only Minor shared with
+  standards, and one explicit
+  limitation, Round 17's red team's own
+  builds never running in its sitting,
+  charged with no new carry because the
+  unbuilt code is byte-identical to the
+  landed Round 16 tree's code and
+  UH-104 built that code fresh in Round
+  17). The census at this read-back:
+  four issue comments, zero reviews,
+  zero review comments. Three comments
+  stood at the owner record (the Trunk
+  merged note, the summary shell, and
+  the lane's merge request); the fourth
+  is the owner's landing comment
+  7062504747 itself, posted after the
+  merge, and no CodeRabbit comment was
+  posted after the landing, so nothing
+  post-landing stands to disposition
+  beyond the charges themselves. The
+  shell 7061695722 in its true final
+  form at this read-back is 11,652
+  characters, last edited
+  2026-11-21T11:13:34Z, its change
+  assessment naming the closure head
+  8a53dde9, pre-merge checks at 4
+  passed and none failed, Merge Risk
+  at Minimal, Run ID
+  9c7acee2-ed73-4143-b40c-2188a8c6c38e,
+  and the sentence that no actionable
+  comments were generated in the recent
+  review. The build lane first recorded
+  the shell at 11,650 characters in the
+  body at its earlier edited stamp; the
+  owner record states it at 11,652
+  characters, two characters longer,
+  with every disposition-bearing
+  element unchanged, and this read-back
+  confirms 11,652 as its true final
+  form. Its one style observation, the
+  title long at 140 characters with the
+  verdict Passed, stands recorded in
+  the body. There is nothing to fix and
+  nothing to dismiss, and the absence
+  is the disposition. This entry also
+  contracts Round 16's red team
+  limitation in full by name, as the
+  owner record charges: the Round 16
+  red team's own builds never ran in
+  its sitting (the write wave stood
+  closed for its whole sitting, its
+  probes standing at zero bytes through
+  46 probe cycles), its ready runner
+  was stopped when its report finalized
+  so nothing raced it, and the
+  independent-build confirmation that
+  stood for five consecutive rounds was
+  not counted for Round 16 and stood
+  carried until UH-104 discharged it in
+  Round 17. The CONTRACT's UH-104 entry
+  omitted the runner-stopped clause;
+  this entry carries the limitation
+  whole, that clause included.
+- UH-110. The standing regression, in
+  the contracted forms, measured at the
+  base (the Round 17 merge 3d5b3431,
+  its tree verified blob for blob
+  against the API tree before any cell
+  was trusted). The oracle pairing
+  stands as UH-65 verifies it: the
+  archive of the Python final commit
+  03658d9, tree ffa48f27, verified blob
+  for blob against the driven copy at
+  this round's hand, and its own suite
+  passing 28. The gate at the base and
+  again on this round's final tree:
+  cargo test 33 passed and 0 failed (4
+  unit, 24 scoring, 5 shapes), clippy
+  with warnings denied clean, fmt
+  clean, from untruncated captures at
+  both trees, and the two builds
+  byte-identical at sha256 8ed5606c and
+  1,579,944 bytes. battery10 passes
+  whole: ALL PASS, the realistic corpus
+  at 235 rules, 24 tapes, 5,276
+  events, and 42,941 observations over
+  an 8,181,065-byte document.
+  battery11 stands at its settled
+  posture: 18 PASS, and exactly the two
+  settled cells X989 and X990 failing
+  against the Round 11 instrument's
+  refusal expectation while both arms
+  land the write by head-link
+  replacement at exit 0, read as the
+  settled mis-specification from PR
+  13's landing, not a conviction;
+  X991 and X992 stand in the crash
+  class and the sequential-splice cell
+  stands as contracted. battery12
+  stands whole at UH-79's dispositions
+  as contracted in UH-83: eighteen PASS
+  lines, FAILURES: 0. battery13 stands
+  whole at UH-85's dispositions: R1 to
+  R8 all PASS with the variants-equal-
+  control cross-check, FAILURES: 0.
+  battery14 stands whole at UH-90's
+  dispositions: T1 to T8 all PASS with
+  both cross-checks, FAILURES: 0.
+  battery15 stands whole at UH-95's
+  dispositions: V1 to V9 all PASS with
+  both cross-checks, FAILURES: 0.
+  battery16 stands whole at UH-100's
+  dispositions: L1 to L9 all PASS with
+  both cross-checks, FAILURES: 0.
+  battery17 stands whole at UH-106's
+  dispositions: K1 to K9 all PASS with
+  both cross-checks, FAILURES: 0, the
+  six alternate constructions
+  reproducing the control byte for
+  byte, the duplicate rule adding
+  exactly the duplicates key, and the
+  unclosed fence adding exactly the
+  warnings key naming line 9. The
+  differential harness stands at 15
+  cases and 134 steps, running clean
+  against this round's builds (0
+  failures at the base build and again
+  at the head build, exit 0 both
+  times), the harness file unmodified
+  at sha256 110042d6, and is unchanged
+  this round: no case convicted, so no
+  case was added. The Quickstart
+  capture reproduces the README's
+  first-screen document byte for byte
+  at 1,687 bytes, exit 0, at both
+  trees, from the synthetic rules
+  against the synthetic tape.
+- UH-111. The rules file's
+  block-closure surface, measured fresh
+  against the Python oracle, a surface
+  no earlier item contracts in its
+  scoped form: the contract holds no
+  count for a tilde fence, a fence
+  closed by a longer run of its own
+  character, a fence whose closing run
+  is too short, a fence addressed by
+  the other character, a fence with an
+  info string, an indented fence, a
+  comment that opens and closes on one
+  line, or a comment block that never
+  closes, at the score CLI. Round 17
+  measured the rules file's structural
+  surface, Round 16 its line-boundary
+  surface, Round 15 the tape file's
+  value-shape surface, Round 14 the
+  tape file's byte surface, and Round
+  13 the rules file's byte surface.
+  Its novelty stands scoped against
+  its standing neighbours by name:
+  UH-106 contracts the three block
+  constructions of one fenced block
+  closed by its own three backticks,
+  one comment block closed on its own
+  line, and one unclosed backtick
+  fence. Both rules readers state the
+  same closure law, and the twins
+  agreed in every cell: exit, stderr,
+  the input tree untouched, and the
+  document byte for byte once the
+  port's version line is stripped. A
+  tilde fence block holding a bullet
+  line, a backtick fence closed by a
+  longer run, a fence opened with an
+  info string, a comment that opens and
+  closes on one line holding a bullet
+  line, and an indented fence block
+  each reproduce the control's document
+  byte for byte on both arms, the tape
+  read and scored once, six scores and
+  one observation. A fence addressed by
+  a run of the other character and a
+  fence whose closing run is too short
+  each add exactly one key, a warnings
+  array holding the one warning that
+  names the fence's opening line at
+  line 9 and states the rest of the
+  file was read as code. A comment
+  block that never closes adds no key
+  at all and reproduces the control
+  byte for byte, where an unclosed
+  fence warns. The family ran in stdout
+  mode only and never named an output,
+  so it does not touch the resolver
+  walk. No conviction; nothing is
+  repaired.
+- UH-112. UH-73's text does not spell
+  its output construction; this round's
+  measurement family does not touch the
+  resolver walk, so the observation is
+  carried by name again: the
+  head-spelling posture (a head spelling
+  replaces the chain's head link itself
+  and lands at exit 0 on both sides; a
+  through-chain spelling refuses at the
+  write; the guard resolves through 990
+  splices and fails at the 991st under
+  every construction) stands on the
+  Round 11 reviews' reproduction,
+  uncontracted by any item, and is owed
+  to the next round whose family touches
+  the walk.
+- UH-113. README records 18 of 100
+  only in the closure commit. The
+  closure commit is written before
+  this round's three reviews, in the
+  standing form of UH-69, UH-77, UH-82,
+  UH-87, UH-92, UH-97, UH-102, and
+  UH-108, and the record takes effect
+  only when the owner merges after the
+  reviews, fixes, and owner verification.
