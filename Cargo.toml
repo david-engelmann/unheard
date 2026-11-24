@@ -2,6 +2,7 @@
 name = "unheard"
 version = "0.1.0"
 edition = "2021"
+description = "Scores every instruction by observed obedience across hundreds of runs and names the ones agents systematically ignore, then proposes rewording, relocation, or deletion."
 license = "MIT"
 
 [dependencies]
